@@ -1,0 +1,13 @@
+name: roi_baseline
+
+spatial_levels:
+  - roi
+
+statistics:
+  - median
+  - iqr
+
+condition_views:
+  - CE
+  - OE
+  - CE_minus_OE

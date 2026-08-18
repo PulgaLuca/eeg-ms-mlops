@@ -1,0 +1,8 @@
+data/raw/
+data/processed/
+data/metadata/
+reports/figures/
+!data/raw/.gitkeep
+__pycache__/
+.venv/
+.ipynb_checkpoints/
