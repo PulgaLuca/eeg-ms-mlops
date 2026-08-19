@@ -6,7 +6,7 @@ Only some tests to leverage data knowledge from given matlab files.
 import scipy.io as sio
 
 # Just a loading test with PSD/ms
-data = sio.loadmat(r"C:\Users\lucap\Desktop\Tesi_LucaPulga\data\Features\PSD\ms\PSDrelative_ID_01_T0_CE.mat")
+data = sio.loadmat(r"C:\Users\lucap\Desktop\Tesi_LucaPulga\eeg-ms-mlops\data\raw\PSD\ms\PSDrelative_ID_01_T0_CE.mat")
 
 print()
 for k, v in data.items():

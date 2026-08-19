@@ -102,19 +102,19 @@ def matrix_to_long(
         }
     )
 
-
 def psd_to_long(
     metadata: FileMetadata,
     data: dict[str, np.ndarray],
     channels: list[str],
     roi_names: list[str],
 ) -> pd.DataFrame:
-    """Converte le 20 matrici PSD previste nel formato canonico."""
+    """Converte PSD e indici derivati nel formato canonico."""
 
     frames: list[pd.DataFrame] = []
 
+    # Feature PSD calcolate per ciascuna banda.
     for band in BANDS:
-        specifications = [
+        band_specifications = [
             (
                 f"PSD_{band}",
                 "absolute_power",
@@ -141,7 +141,12 @@ def psd_to_long(
             ),
         ]
 
-        for variable, measure, spatial_level, locations in specifications:
+        for (
+            variable,
+            measure,
+            spatial_level,
+            locations,
+        ) in band_specifications:
             frames.append(
                 matrix_to_long(
                     metadata=metadata,
@@ -153,8 +158,67 @@ def psd_to_long(
                 )
             )
 
-    return pd.concat(frames, ignore_index=True)
+    # ATTENZIONE: questo blocco deve essere fuori dal ciclo BANDS.
+    derived_specifications = [
+        (
+            "PSD_theta_alpha",
+            "theta_alpha_ratio",
+            "channel",
+            channels,
+        ),
+        (
+            "PSD_theta_alpha_ROI",
+            "theta_alpha_ratio",
+            "roi",
+            roi_names,
+        ),
+        (
+            "PSD_delta_alpha",
+            "delta_alpha_ratio",
+            "channel",
+            channels,
+        ),
+        (
+            "PSD_delta_alpha_ROI",
+            "delta_alpha_ratio",
+            "roi",
+            roi_names,
+        ),
+        (
+            "SFR",
+            "sfr",
+            "channel",
+            channels,
+        ),
+        (
+            "SFR_ROI",
+            "sfr",
+            "roi",
+            roi_names,
+        ),
+    ]
 
+    for (
+        variable,
+        measure,
+        spatial_level,
+        locations,
+    ) in derived_specifications:
+        frames.append(
+            matrix_to_long(
+                metadata=metadata,
+                matrix=data[variable],
+                locations=locations,
+                measure=measure,
+                band="derived",
+                spatial_level=spatial_level,
+            )
+        )
+
+    return pd.concat(
+        frames,
+        ignore_index=True,
+    )
 
 def complexity_to_long(
     metadata: FileMetadata,

@@ -10,7 +10,12 @@ src/eeg_ms/data/discovery.py
 src/eeg_ms/data/loading.py
 src/eeg_ms/data/parsing.py
 src/eeg_ms/data/validation.py
+src/eeg_ms/evaluation/analyze_results.py
+src/eeg_ms/evaluation/bootstrap.py
+src/eeg_ms/evaluation/metrics.py
+src/eeg_ms/evaluation/plots.py
 src/eeg_ms/features/build_tabular.py
+src/eeg_ms/modeling/feature_stability.py
 src/eeg_ms/modeling/models.py
 src/eeg_ms/modeling/run_experiments.py
 src/eeg_ms/modeling/xgboost_balanced.py
@@ -22,6 +27,8 @@ src/eeg_ms/validation/generate_splits.py
 src/eeg_ms/validation/nested_cv.py
 src/eeg_ms/validation/preprocessing.py
 src/eeg_ms/validation/splitting.py
+src/eeg_ms/visualization/__init__.py
+src/eeg_ms/visualization/topomaps.py
 src/eeg_ms_mlops.egg-info/PKG-INFO
 src/eeg_ms_mlops.egg-info/SOURCES.txt
 src/eeg_ms_mlops.egg-info/dependency_links.txt

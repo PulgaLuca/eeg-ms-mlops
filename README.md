@@ -111,3 +111,12 @@ Questo conteggio è un controllo molto utile: una differenza indica file, variab
 
 
 python -m eeg_ms.quality.run_quality_control
+
+
+I notebook leggono `data/processed/canonical_features.parquet` e
+`data/raw/canali.mat`. Le mappe di gruppo aggregano prima le finestre entro
+soggetto e solo dopo i soggetti, evitando di attribuire alle 18 finestre il
+ruolo di osservazioni indipendenti.
+
+pip install -e ".[dev]"
+jupyter lab
