@@ -112,6 +112,13 @@ Questo conteggio è un controllo molto utile: una differenza indica file, variab
 
 python -m eeg_ms.quality.run_quality_control
 
+pytest
+python -m eeg_ms.features.build_tabular       # costruisce subject_features_roi.parquet
+python -m eeg_ms.validation.generate_splits    # genera e salva outer_test_folds.csv
+pytest tests/test_splitting.py                 # verifica le 3 proprietà anti-leakage
+python -m eeg_ms.modeling.run_experiments      # nested CV su tutti i 6 modelli
+python -m eeg_ms.evaluation.analyze_results    # OOF, bootstrap, stabilità feature, grafici
+
 
 I notebook leggono `data/processed/canonical_features.parquet` e
 `data/raw/canali.mat`. Le mappe di gruppo aggregano prima le finestre entro
