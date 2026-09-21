@@ -28,7 +28,5 @@ def load_validation_config(
         outer_n_splits=int(raw["outer_cv"]["n_splits"]),
         outer_n_repeats=int(raw["outer_cv"]["n_repeats"]),
         inner_n_splits=int(raw["inner_cv"]["n_splits"]),
-        primary_metric=str(
-            raw["model_selection"]["primary_metric"]
-        ),
+        primary_metric=str(raw["model_selection"]["primary_metric"]),
     )

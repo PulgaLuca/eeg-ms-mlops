@@ -4,17 +4,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from sklearn.base import BaseEstimator
-from sklearn.discriminant_analysis import (
-    LinearDiscriminantAnalysis,
-)
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 
-from eeg_ms.modeling.xgboost_balanced import (
-    BalancedXGBClassifier,
-)
+from eeg_ms.modeling.xgboost_balanced import BalancedXGBClassifier
 
 
 @dataclass(frozen=True)

@@ -4,10 +4,7 @@ from collections.abc import Iterator
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import (
-    RepeatedStratifiedKFold,
-    StratifiedKFold,
-)
+from sklearn.model_selection import RepeatedStratifiedKFold, StratifiedKFold
 
 from eeg_ms.validation.config import ValidationConfig
 

@@ -10,12 +10,8 @@ from eeg_ms.config import (
     SUBJECTS_DATA,
     SELECTED_FEATURES_FILE
 )
-from eeg_ms.modeling.models import (
-    get_model_specifications,
-)
-from eeg_ms.validation.config import (
-    load_validation_config,
-)
+from eeg_ms.modeling.models import get_model_specifications
+from eeg_ms.validation.config import load_validation_config
 from eeg_ms.validation.nested_cv import run_nested_cv
 
 

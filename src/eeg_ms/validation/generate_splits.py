@@ -2,11 +2,7 @@
 
 import pandas as pd
 
-from eeg_ms.config import (
-    OUTER_FOLDS_FILE,
-    SPLITS_DIR,
-    SUBJECTS_DATA,
-)
+from eeg_ms.config import OUTER_FOLDS_FILE, SPLITS_DIR, SUBJECTS_DATA
 from eeg_ms.validation.config import load_validation_config
 from eeg_ms.validation.splitting import generate_outer_assignments
 

@@ -17,10 +17,7 @@ from sklearn.model_selection import GridSearchCV
 
 from eeg_ms.validation.config import ValidationConfig
 from eeg_ms.validation.preprocessing import build_ml_pipeline
-from eeg_ms.validation.splitting import (
-    iter_outer_splits,
-    make_inner_cv,
-)
+from eeg_ms.validation.splitting import iter_outer_splits, make_inner_cv
 
 
 def calculate_binary_metrics(

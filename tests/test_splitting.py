@@ -1,10 +1,7 @@
 import pandas as pd
 
 from eeg_ms.validation.config import ValidationConfig
-from eeg_ms.validation.splitting import (
-    generate_outer_assignments,
-    get_outer_split,
-)
+from eeg_ms.validation.splitting import generate_outer_assignments, get_outer_split
 
 
 def make_subjects() -> pd.DataFrame:
