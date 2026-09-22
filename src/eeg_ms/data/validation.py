@@ -24,9 +24,14 @@ class ValidationIssue:
         return asdict(self)
 
 
+# le matrici EEG fornite sono organizzate in modo standard e dunque: channels x temporal_windows,
+# mentre le feature aggregate per ROI sono ROI x temporal_windows.
 CHANNEL_SHAPE = (N_CHANNELS, N_WINDOWS)
 ROI_SHAPE = (N_ROIS, N_WINDOWS)
 
+# Mappa ciascuna variabile attesa a una forma corretta. La struttura differisce per
+# PSD e complexity ma è definita in modo esplicito per ogni feature, così da catturare
+# immediatamente variabili mancanti o forme non compatibili.
 PSD_EXPECTED: dict[str, tuple[int, int]] = {}
 
 for band in BANDS:
@@ -65,11 +70,17 @@ def validate_feature_data(
 ) -> list[ValidationIssue]:
     """Controlla variabili, shape, tipo e valori di un file."""
 
+    # ogni file viene validato come entità indipendente: il controllo verifica che le
+    # feature attese siano presenti, abbiano forma coerente e rispettino i vincoli fisici
+    # e statistici del dominio EEG.
     issues: list[ValidationIssue] = []
     expected = EXPECTED_VARIABLES[metadata.family]
     actual_names = set(data)
     expected_names = set(expected)
 
+    # avere variabile obbligatoria assente è un errore strutturale del dataset, 
+    # perché il modello o i passaggi successivi si aspettano sempre quel campo nello 
+    # schema del dataset.
     for name in sorted(expected_names - actual_names):
         issues.append(
             ValidationIssue(
@@ -80,6 +91,10 @@ def validate_feature_data(
             )
         )
 
+    # le variabili extra non sono "fatali" come la mancanza di variabili obbligatorie, 
+    # ma segnalano una discrepanza tra il contenuto del file e lo schema definito del
+    # dataset; la loro presenza può derivare da preprocessing
+    # aggiuntivo o da file generati in modo non standard.
     extra_names = sorted(actual_names - expected_names)
     if extra_names:
         issues.append(
@@ -97,6 +112,8 @@ def validate_feature_data(
 
         array = np.asarray(data[name])
 
+        # shape attesa è il primo vincolo, per le feature EEG, le dimensioni codificano
+        # rispettivamente il numero di canali/ROI e il numero di finestre temporali.
         if array.shape != expected_shape:
             if (
                 metadata.family == "complexity"
@@ -131,6 +148,8 @@ def validate_feature_data(
 
             continue
 
+        # I dati devono essere numerici per poter essere processati in pipeline.
+        # una colonna stringa o oggetto impedisce qualsiasi operazione matematica di validità.
         if not np.issubdtype(array.dtype, np.number):
             issues.append(
                 ValidationIssue(
@@ -142,6 +161,8 @@ def validate_feature_data(
             )
             continue
 
+        # Valori non finiti sono un'indicazione di dati corrotti o di passaggi intermedii non
+        # riusciti: NaN e Inf non sono compatibili con la modellazione statistica.
         if not np.isfinite(array).all():
             n_invalid = int((~np.isfinite(array)).sum())
             issues.append(
@@ -153,6 +174,8 @@ def validate_feature_data(
                 )
             )
 
+        # Per la PSD, i valori di potenza non dovrebbero essere negativi; questo controllo
+        # cattura problemi di scaling, conversione o calcolo numerico fuori dominio.
         if metadata.family == "psd" and not name.endswith("_rel"):
             if np.any(array < 0):
                 issues.append(
@@ -169,11 +192,11 @@ def validate_feature_data(
         )
         is_normalized_entropy = metadata.family == "complexity"
 
+        # le feature relative e le entropie normalizzate sono intese come quantità nel
+        # dominio [0, 1]: un valore fuori da questo intervallo indica un bug di normalizzazione.
         if is_relative_psd or is_normalized_entropy:
             tolerance = 1e-6
-            outside_range = (
-                (array < -tolerance) | (array > 1 + tolerance)
-            )
+            outside_range = ((array < -tolerance) | (array > 1 + tolerance))
 
             if np.any(outside_range):
                 issues.append(
@@ -193,6 +216,8 @@ def validate_dataset_completeness(
 ) -> list[ValidationIssue]:
     """Controlla duplicati e combinazioni mancanti per soggetto."""
 
+    # per ciascun soggetto è atteso un record per ogni famiglia e condizione. 
+    # Questo controllo identifica sia duplicati sia lacune strutturali nell'archivio di input.
     issues: list[ValidationIssue] = []
 
     keys = [
@@ -241,6 +266,9 @@ def validate_channel_metadata(
 ) -> list[ValidationIssue]:
     """Controlla ordine, unicità e composizione delle ROI."""
 
+    # i metadati dei canali sono essenziali per allineare correttamente i dati EEG con le
+    # definizioni delle ROI e i problemi qui possono generare feature coerenti dal punto di
+    # vista numerico ma semanticamente sbagliate.
     issues: list[ValidationIssue] = []
 
     if len(channels) != N_CHANNELS:
@@ -265,6 +293,8 @@ def validate_channel_metadata(
 
     known_channels = set(channels)
 
+    # le ROI devono essere costruite solo da canali effettivamente presenti, in caso
+    # contrario il mapping tra feature e posizioni EEG sarebbe incoerente
     for roi_name, roi_channels in rois.items():
         unknown = sorted(set(roi_channels) - known_channels)
 
@@ -285,6 +315,8 @@ def validate_channel_metadata(
     }
     unassigned = sorted(known_channels - assigned)
 
+    # Un canale non assegnato a nessuna ROI non rompe necessariamente la pipeline, ma sicuramente 
+    # indica una possibile perdita di informazione oppure una definizione incompleta delle regioni.
     if unassigned:
         issues.append(
             ValidationIssue(

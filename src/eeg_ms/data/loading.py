@@ -16,15 +16,9 @@ def load_feature_file(
     """Carica tutte le variabili utente presenti in un file di feature."""
 
     try:
-        raw = loadmat(
-            metadata.path,
-            simplify_cells=True,
-        )
+        raw = loadmat(metadata.path, simplify_cells=True,)
     except NotImplementedError as exc:
-        raise ValueError(
-            f"{metadata.path} sembra essere MATLAB v7.3/HDF5. "
-            "Questo dataset richiederebbe h5py."
-        ) from exc
+        raise ValueError(f"{metadata.path} sembra essere MATLAB v7.3/HDF5. Questo dataset richiederebbe h5py.") from exc
 
     return {
         name: np.asarray(value)

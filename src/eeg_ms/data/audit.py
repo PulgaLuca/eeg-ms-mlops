@@ -53,9 +53,7 @@ def run_audit(
 
         file_rows.append(
             {
-                "relative_path": str(
-                    metadata.path.relative_to(raw_dir)
-                ),
+                "relative_path": str(metadata.path.relative_to(raw_dir)),
                 "family": metadata.family,
                 "group": metadata.group,
                 "subject_id": metadata.subject_id,
@@ -65,10 +63,7 @@ def run_audit(
                 "file_size_bytes": metadata.path.stat().st_size,
                 "sha256": calculate_sha256(metadata.path),
                 "n_variables": len(data),
-                "has_errors": any(
-                    issue.severity == "error"
-                    for issue in file_issues
-                ),
+                "has_errors": any(issue.severity == "error" for issue in file_issues),
             }
         )
 
@@ -78,27 +73,17 @@ def run_audit(
 
             variable_rows.append(
                 {
-                    "relative_path": str(
-                        metadata.path.relative_to(raw_dir)
-                    ),
+                    "relative_path": str(metadata.path.relative_to(raw_dir)),
                     "subject_id": metadata.subject_id,
                     "family": metadata.family,
                     "condition": metadata.condition,
                     "variable": variable_name,
                     "shape": "x".join(map(str, array.shape)),
                     "dtype": str(array.dtype),
-                    "n_nan": (
-                        int(np.isnan(array).sum()) if numeric else None
-                    ),
-                    "n_inf": (
-                        int(np.isinf(array).sum()) if numeric else None
-                    ),
-                    "minimum": (
-                        float(np.nanmin(array)) if numeric else None
-                    ),
-                    "maximum": (
-                        float(np.nanmax(array)) if numeric else None
-                    ),
+                    "n_nan": (int(np.isnan(array).sum()) if numeric else None),
+                    "n_inf": (int(np.isinf(array).sum()) if numeric else None),
+                    "minimum": (float(np.nanmin(array)) if numeric else None),
+                    "maximum": (float(np.nanmax(array)) if numeric else None),
                 }
             )
 
@@ -111,15 +96,8 @@ def run_audit(
         )
     )
 
-    pd.DataFrame(file_rows).to_csv(
-        output_dir / "file_manifest.csv",
-        index=False,
-    )
-
-    pd.DataFrame(variable_rows).to_csv(
-        output_dir / "variable_inventory.csv",
-        index=False,
-    )
+    pd.DataFrame(file_rows).to_csv(output_dir / "file_manifest.csv", index=False,)
+    pd.DataFrame(variable_rows).to_csv(output_dir / "variable_inventory.csv",index=False,)
 
     report = {
         "status": (
@@ -140,10 +118,7 @@ def run_audit(
         "issues": [issue.to_dict() for issue in issues],
     }
 
-    with (output_dir / "validation_report.json").open(
-        "w",
-        encoding="utf-8",
-    ) as file:
+    with (output_dir / "validation_report.json").open("w", encoding="utf-8",) as file:
         json.dump(report, file, indent=2, ensure_ascii=False)
 
     return issues
@@ -152,10 +127,7 @@ def run_audit(
 def main() -> None:
     issues = run_audit()
 
-    errors = [
-        issue for issue in issues
-        if issue.severity == "error"
-    ]
+    errors = [issue for issue in issues if issue.severity == "error"]
 
     for issue in issues:
         print(
@@ -164,9 +136,7 @@ def main() -> None:
         )
 
     if errors:
-        raise SystemExit(
-            f"Audit fallito con {len(errors)} errori."
-        )
+        raise SystemExit(f"Audit fallito con {len(errors)} errori.")
 
     print("Audit completato senza errori bloccanti.")
 

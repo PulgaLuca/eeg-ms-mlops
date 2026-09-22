@@ -32,33 +32,20 @@ OUTER_FOLDS_FILE = SPLITS_DIR / "outer_test_folds.csv"
 
 FEATURE_CONFIGS = CONFIGS / "features"
 
-SUBJECT_FEATURES_ROI = (
-    DATA_PROCESSED / "subject_features_roi.parquet"
-)
+SUBJECT_FEATURES_ROI = DATA_PROCESSED / "subject_features_roi.parquet"
 
 METRICS_DIR = ARTIFACTS / "metrics"
 PREDICTIONS_DIR = ARTIFACTS / "predictions"
 
-EVALUATION_TABLES = (
-    REPORTS / "tables" / "model_evaluation"
-)
+EVALUATION_TABLES = REPORTS / "tables" / "model_evaluation"
 
-EVALUATION_FIGURES = (
-    REPORTS / "figures" / "model_evaluation"
-)
+EVALUATION_FIGURES = REPORTS / "figures" / "model_evaluation"
 
-FOLD_METRICS_FILE = (
-    METRICS_DIR / "nested_cv_fold_metrics.csv"
-)
+FOLD_METRICS_FILE = METRICS_DIR / "nested_cv_fold_metrics.csv"
 
-OOF_PREDICTIONS_FILE = (
-    PREDICTIONS_DIR / "nested_cv_predictions.csv"
-)
+OOF_PREDICTIONS_FILE = PREDICTIONS_DIR / "nested_cv_predictions.csv"
 
-SELECTED_FEATURES_FILE = (
-    ARTIFACTS / "selected_features"
-    / "nested_cv_selected_features.csv"
-)
+SELECTED_FEATURES_FILE = ARTIFACTS / "selected_features" / "nested_cv_selected_features.csv"
 
 TARGET_MAP = {
     "hc": 0,
