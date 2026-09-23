@@ -1,8 +1,7 @@
 """Costruzione della rappresentazione tabellare subject-level.
 Il modulo non addestra modelli, non crea gli split e non normalizza i dati.
 
-ROI: 32 soggetti, 504 feature;
-Channel: 32 soggetti, 2268 feature.
+Le matrici finali includono mean, std, median, q25, q75, iqr, min e max.
 """
 
 from collections.abc import Sequence
@@ -58,6 +57,8 @@ def aggregate_windows(
             median=("value", "median"),
             q25=("value", lambda x: x.quantile(0.25)),
             q75=("value", lambda x: x.quantile(0.75)),
+            min=("value", "min"),
+            max=("value", "max"),
             n_observed=("value", "count"),
         )
         .reset_index()
@@ -245,7 +246,16 @@ def main() -> None:
             canonical=canonical,
             subjects=subjects,
             spatial_levels=(spatial_level,),
-            statistics=("median", "iqr"),
+            statistics=(
+                "mean",
+                "std",
+                "median",
+                "q25",
+                "q75",
+                "iqr",
+                "min",
+                "max",
+            ),
             condition_views=("CE", "OE", "CE_minus_OE"),
         )
 
