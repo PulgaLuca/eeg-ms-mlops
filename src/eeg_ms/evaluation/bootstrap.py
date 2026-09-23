@@ -54,9 +54,7 @@ def bootstrap_confidence_intervals(
     lower_quantile = alpha / 2
     upper_quantile = 1 - alpha / 2
 
-    for model, model_frame in (
-        aggregated_predictions.groupby("model")
-    ):
+    for model, model_frame in (aggregated_predictions.groupby("model")):
         model_frame = model_frame.reset_index(drop=True)
 
         targets = model_frame["target"].to_numpy()
@@ -75,10 +73,7 @@ def bootstrap_confidence_intervals(
         }
 
         for _ in range(n_bootstrap):
-            indices = stratified_bootstrap_indices(
-                targets,
-                rng,
-            )
+            indices = stratified_bootstrap_indices(targets, rng,)
 
             sample_metrics = calculate_binary_metrics(
                 targets=targets[indices],

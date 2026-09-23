@@ -115,41 +115,22 @@ def validate_feature_data(
         # shape attesa è il primo vincolo, per le feature EEG, le dimensioni codificano
         # rispettivamente il numero di canali/ROI e il numero di finestre temporali.
         if array.shape != expected_shape:
-            if (
-                metadata.family == "complexity"
-                and name in {"spectral_all", "spectral_all_ROI"}
-                and array.ndim == 2
-                and array.shape[0] == expected_shape[0]
-            ):
-                issues.append(
-                    ValidationIssue(
-                        severity="warning",
-                        code="unexpected_window_count",
-                        message=(
-                            f"{name}: shape {array.shape}, "
-                            f"attesa {expected_shape}; "
-                            f"numero di finestre diverso da N_WINDOWS={N_WINDOWS}"
-                        ),
-                        path=str(metadata.path),
-                    )
+            issues.append(
+                ValidationIssue(
+                    severity="warning",
+                    code="invalid_shape",
+                    message=(
+                        f"{name}: shape {array.shape}, "
+                        f"attesa {expected_shape}"
+                        f"numero di finestre diverso da N_WINDOWS={N_WINDOWS}"
+                    ),
+                    path=str(metadata.path),
                 )
-            else:
-                issues.append(
-                    ValidationIssue(
-                        severity="error",
-                        code="invalid_shape",
-                        message=(
-                            f"{name}: shape {array.shape}, "
-                            f"attesa {expected_shape}"
-                        ),
-                        path=str(metadata.path),
-                    )
-                )
+            )
 
             continue
 
-        # I dati devono essere numerici per poter essere processati in pipeline.
-        # una colonna stringa o oggetto impedisce qualsiasi operazione matematica di validità.
+        # I dati devono essere solo numerici (no str, obj, etc..) per poter essere processati in pipeline.
         if not np.issubdtype(array.dtype, np.number):
             issues.append(
                 ValidationIssue(
@@ -192,8 +173,7 @@ def validate_feature_data(
         )
         is_normalized_entropy = metadata.family == "complexity"
 
-        # le feature relative e le entropie normalizzate sono intese come quantità nel
-        # dominio [0, 1]: un valore fuori da questo intervallo indica un bug di normalizzazione.
+        # le feature relative e le entropie normalizzate sono intese come quantità nel dominio [0, 1]
         if is_relative_psd or is_normalized_entropy:
             tolerance = 1e-6
             outside_range = ((array < -tolerance) | (array > 1 + tolerance))

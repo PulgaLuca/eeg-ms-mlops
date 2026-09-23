@@ -1,6 +1,7 @@
 """Analisi controllata dei risultati nested CV."""
 
 import pandas as pd
+import shutil
 
 from eeg_ms.config import (
     EVALUATION_FIGURES,
@@ -29,6 +30,7 @@ from eeg_ms.evaluation.plots import (
 from eeg_ms.modeling.feature_stability import (
     calculate_feature_stability,
 )
+from eeg_ms.tracking import latest_run_directory
 from eeg_ms.validation.config import (
     load_validation_config,
 )
@@ -119,6 +121,21 @@ def main() -> None:
             EVALUATION_TABLES / "feature_stability.csv",
             index=False,
         )
+
+    run_dir = latest_run_directory()
+    if run_dir is not None:
+        run_tables = run_dir / "evaluation" / "tables"
+        run_figures = run_dir / "evaluation" / "figures"
+        run_tables.mkdir(parents=True, exist_ok=True)
+        run_figures.mkdir(parents=True, exist_ok=True)
+
+        for source in EVALUATION_TABLES.glob("*"):
+            if source.is_file():
+                shutil.copy2(source, run_tables / source.name)
+
+        for source in EVALUATION_FIGURES.glob("*"):
+            if source.is_file():
+                shutil.copy2(source, run_figures / source.name)
 
     plot_fold_metric_distributions(
         fold_metrics,

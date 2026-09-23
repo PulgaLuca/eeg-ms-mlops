@@ -74,177 +74,177 @@
   "issues": [
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\hc\\SpectralEntropy_ID_02_CTR_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/hc/SpectralEntropy_ID_02_CTR_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_02_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_02_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_02_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_02_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_03_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_03_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 21), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_03_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 21), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_03_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_04_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_04_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_05_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_05_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_05_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_05_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_06_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_06_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_07_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_07_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_08_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_08_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_10_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_10_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_11_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_11_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_12_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_12_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_13_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_13_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_14_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_14_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_14_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_14_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_15_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_15_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_15_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_15_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_16_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_16_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_17_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_17_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_18_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_18_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_18_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_18_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_19_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_19_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 20), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_19_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 20), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_19_T0_OE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_20_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_20_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_21_T0_CE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_21_T0_CE.mat"
     },
     {
       "severity": "warning",
-      "code": "unexpected_window_count",
-      "message": "spectral_all: shape (27, 19), attesa (27, 18); numero di finestre diverso da N_WINDOWS=18",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\Complexity\\ms\\SpectralEntropy_ID_24_T0_OE.mat"
+      "code": "invalid_shape",
+      "message": "spectral_all: shape (27, 19), attesa (27, 18)numero di finestre diverso da N_WINDOWS=18",
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/Complexity/ms/SpectralEntropy_ID_24_T0_OE.mat"
     },
     {
       "severity": "warning",
       "code": "channels_without_roi",
       "message": "Canali non assegnati alle ROI: ['Cz', 'Fz', 'Pz']",
-      "path": "C:\\Users\\lucap\\Desktop\\Tesi_LucaPulga\\eeg-ms-mlops\\data\\raw\\chanlocs.mat"
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/raw/chanlocs.mat"
     }
   ]
 }

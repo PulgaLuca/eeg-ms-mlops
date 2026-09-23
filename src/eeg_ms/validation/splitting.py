@@ -1,4 +1,38 @@
-"""Split stratificati e riproducibili a livello soggetto."""
+"""Split stratificati e riproducibili a livello soggetto.
+Uno split stratificato cerca di mantenere in ogni fold una proporzione simile tra le classi.
+
+Noi abbiamo 32 soggetti:
+8 HC
+24 MS
+
+Con 4 fold, ogni fold dovrebbe contenere approssimativamente:
+2 HC
+6 MS
+
+Ogni fold contiene quindi 8 soggetti, mantenendo la proporzione complessiva:
+25% HC
+75% MS
+
+Senza stratificazione potremmo ottenere:
+fold 1: 0 HC, 8 MS
+fold 2: 1 HC, 7 MS
+fold 3: 3 HC, 5 MS
+fold 4: 4 HC, 4 MS
+Il primo fold non avrebbe nemmeno entrambe le classi e alcune metriche, come ROC-AUC, diventerebbero problematiche o non interpretabili.
+
+Con n_splits=4 e n_repeats=5 da validation.yaml:
+
+i soggetti vengono divisi in 4 fold;
+ogni fold viene usato una volta come test;
+l’intera procedura viene ripetuta 5 volte con nuove assegnazioni;
+ogni soggetto è usato come test una volta per ciascuna ripetizione.
+
+Con 5 ripetizioni, ogni soggetto riceve 5 predizioni out-of-fold, 
+una per ripetizione.
+
+Questo riduce la dipendenza da una singola suddivisione casuale 
+dei dati e rende la stima delle prestazioni più stabile.
+"""
 
 from collections.abc import Iterator
 
@@ -111,20 +145,9 @@ def generate_outer_assignments(
     dummy_features = np.zeros((len(subjects), 1))
     rows: list[dict] = []
 
-    for split_number, (_, test_indices) in enumerate(
-        splitter.split(
-            dummy_features,
-            subjects["target"],
-        )
-    ):
-        repeat = (
-            split_number // config.outer_n_splits
-        ) + 1
-
-        fold = (
-            split_number % config.outer_n_splits
-        ) + 1
-
+    for split_number, (_, test_indices) in enumerate(splitter.split(dummy_features, subjects["target"])):
+        repeat = (split_number // config.outer_n_splits) + 1
+        fold = (split_number % config.outer_n_splits) + 1
         test_subjects = subjects.iloc[test_indices]
 
         for row in test_subjects.itertuples(index=False):
@@ -140,11 +163,7 @@ def generate_outer_assignments(
 
     assignments = pd.DataFrame(rows)
 
-    validate_outer_assignments(
-        assignments=assignments,
-        subjects=subjects,
-        config=config,
-    )
+    validate_outer_assignments(assignments=assignments, subjects=subjects, config=config)
 
     return assignments
 
@@ -166,26 +185,16 @@ def validate_outer_assignments(
         counts = repeat_rows["subject_id"].value_counts()
 
         if set(counts.index) != expected_subjects:
-            raise ValueError(
-                f"Ripetizione {repeat}: copertura soggetti incompleta."
-            )
+            raise ValueError(f"Ripetizione {repeat}: copertura soggetti incompleta.")
 
         if not (counts == 1).all():
-            raise ValueError(
-                f"Ripetizione {repeat}: un soggetto compare in "
-                "più outer test fold."
-            )
+            raise ValueError(f"Ripetizione {repeat}: un soggetto compare in più outer test fold.")
 
         for fold in range(1, config.outer_n_splits + 1):
-            fold_rows = repeat_rows.loc[
-                repeat_rows["fold"] == fold
-            ]
+            fold_rows = repeat_rows.loc[repeat_rows["fold"] == fold]
 
             if fold_rows["target"].nunique() != 2:
-                raise ValueError(
-                    f"Repeat {repeat}, fold {fold}: "
-                    "outer test senza entrambe le classi."
-                )
+                raise ValueError(f"Repeat {repeat}, fold {fold}: outer test senza entrambe le classi.")
 
 
 def get_outer_split(
@@ -209,10 +218,7 @@ def get_outer_split(
     train_subjects = subjects.loc[~is_test].copy()
     test_subjects = subjects.loc[is_test].copy()
 
-    assert_no_subject_leakage(
-        train_subjects=train_subjects,
-        test_subjects=test_subjects,
-    )
+    assert_no_subject_leakage(train_subjects=train_subjects, test_subjects=test_subjects,)
 
     return train_subjects, test_subjects
 
@@ -229,10 +235,7 @@ def assert_no_subject_leakage(
     overlap = train_ids & test_ids
 
     if overlap:
-        raise RuntimeError(
-            f"Data leakage: soggetti presenti in train e test: "
-            f"{sorted(overlap)}"
-        )
+        raise RuntimeError(f"Data leakage: soggetti presenti in train e test: {sorted(overlap)}")
 
 
 def make_inner_cv(

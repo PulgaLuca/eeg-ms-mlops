@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Run Dashboard | Overview{% endblock %}
+{% block content %}
+<main>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Experiment control room</p>
+      <h1>Leggi la storia dei tuoi run.</h1>
+      <p class="lede">Un punto unico per confrontare input, validazione, modelli e risultati della pipeline EEG-MS.</p>
+    </div>
+    <div class="hero-stamp"><span class="pulse"></span>Live from <b>artifacts/runs</b></div>
+  </section>
+
+  <section class="kpi-grid">
+    <article class="kpi"><span>Run totali</span><strong>{{ total }}</strong><small>archiviati localmente</small></article>
+    <article class="kpi accent"><span>Completati</span><strong>{{ completed }}</strong><small>con risultati disponibili</small></article>
+    <article class="kpi warning"><span>Falliti</span><strong>{{ failed }}</strong><small>da ispezionare</small></article>
+  </section>
+
+  <section class="section-head">
+    <div><p class="eyebrow">Run history</p><h2>Esperimenti recenti</h2></div>
+    <span class="muted">{{ project_root }} · ordinati dal piu recente</span>
+  </section>
+
+  {% if runs %}
+  <section class="run-list">
+    {% for run in runs %}
+    <a class="run-card" href="{{ url_for('run_detail', run_id=run.run_id) }}">
+      <div class="run-main"><span class="status {{ run.status }}">{{ run.status }}</span><h3>{{ run.run_id }}</h3><p>{{ run.started_at }} · {{ run.duration }}</p></div>
+      <div class="run-stat"><span>Soggetti</span><strong>{{ run.n_subjects }}</strong><small>{{ run.n_ms }} MS / {{ run.n_hc }} HC</small></div>
+      <div class="run-stat"><span>Modelli</span><strong>{{ run.models|length }}</strong><small>ROI + channel</small></div>
+      <div class="chevron">&rarr;</div>
+    </a>
+    {% endfor %}
+  </section>
+  {% else %}
+  <div class="empty"><h2>Nessun run trovato</h2><p>Esegui la pipeline per creare il primo esperimento tracciato.</p></div>
+  {% endif %}
+</main>
+{% endblock %}

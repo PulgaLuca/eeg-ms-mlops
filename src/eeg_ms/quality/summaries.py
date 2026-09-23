@@ -131,7 +131,7 @@ def robust_outlier_report(
 
     data["robust_z"] = np.where(
         denominator > 0,
-        (data["window_median"] - median) / denominator,
+        (data["window_median"] - median)/denominator,
         np.nan,
     )
 

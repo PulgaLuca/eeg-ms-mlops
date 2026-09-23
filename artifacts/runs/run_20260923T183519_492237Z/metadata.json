@@ -1,0 +1,250 @@
+{
+  "run_id": "run_20260923T183519_492237Z",
+  "status": "completed",
+  "started_at_utc": "2026-09-23T18:35:19.492231+00:00",
+  "command": "python -m eeg_ms.modeling.run_experiments",
+  "git": {
+    "commit": "74ffd6ab7201b344ee920160b514df071de10cf7",
+    "working_tree_dirty": true
+  },
+  "environment": {
+    "python": "3.12.3 (main, Jan 22 2026, 20:57:42) [GCC 13.3.0]",
+    "python_executable": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/.venv/bin/python",
+    "platform": "Linux-6.17.0-14-generic-x86_64-with-glibc2.39"
+  },
+  "validation_config": {
+    "random_seed": 42,
+    "outer_n_splits": 4,
+    "outer_n_repeats": 5,
+    "inner_n_splits": 3,
+    "primary_metric": "roc_auc"
+  },
+  "inputs": {
+    "subjects": {
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/processed/subjects.csv",
+      "exists": true,
+      "size_bytes": 486,
+      "sha256": "778aba2108e30d57fdd238ff7ee7605ebd6f384428cd50aeae4b3209ca0cf809"
+    },
+    "outer_assignments": {
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/processed/splits/outer_test_folds.csv",
+      "exists": true,
+      "size_bytes": 2436,
+      "sha256": "dbd2d9a8add63696c0a68f64dd4ff6d18f6005f90329e5525d4c0b75298cb01a"
+    },
+    "subject_features_roi": {
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/processed/subject_features_roi.parquet",
+      "exists": true,
+      "size_bytes": 578076,
+      "sha256": "4c9ec1e26d08d0670d73e707fec1262a2d978c6a12804fc517ef89950b3af4ff"
+    },
+    "subject_features_channel": {
+      "path": "/home/dhexby/Desktop/Tesi_LucaPulga/eeg-ms-mlops/data/processed/subject_features_channel.parquet",
+      "exists": true,
+      "size_bytes": 2671967,
+      "sha256": "1c27903b5f09f0292819618ea12044dc6f2695379872941628cf374d722aed81"
+    }
+  },
+  "subjects": {
+    "n_subjects": 32,
+    "group_counts": {
+      "ms": 24,
+      "hc": 8
+    },
+    "target_counts": {
+      "1": 24,
+      "0": 8
+    }
+  },
+  "models": [
+    {
+      "name": "dummy",
+      "scale_features": false,
+      "estimator_parameters": {
+        "constant": null,
+        "random_state": null,
+        "strategy": "prior"
+      },
+      "parameter_grid": {
+        "selector__k": [
+          "all"
+        ]
+      }
+    },
+    {
+      "name": "logistic_elastic_net",
+      "scale_features": true,
+      "estimator_parameters": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 20000,
+        "n_jobs": null,
+        "penalty": "elasticnet",
+        "random_state": 42,
+        "solver": "saga",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "parameter_grid": {
+        "selector__k": [
+          5,
+          10,
+          20
+        ],
+        "model__C": [
+          0.1,
+          1.0,
+          10.0
+        ],
+        "model__l1_ratio": [
+          0.25,
+          0.5,
+          0.75
+        ]
+      }
+    },
+    {
+      "name": "lda",
+      "scale_features": true,
+      "estimator_parameters": {
+        "covariance_estimator": null,
+        "n_components": null,
+        "priors": null,
+        "shrinkage": null,
+        "solver": "lsqr",
+        "store_covariance": false,
+        "tol": 0.0001
+      },
+      "parameter_grid": {
+        "selector__k": [
+          5,
+          10,
+          20
+        ],
+        "model__shrinkage": [
+          "auto",
+          0.1,
+          0.5,
+          0.9
+        ]
+      }
+    },
+    {
+      "name": "knn",
+      "scale_features": true,
+      "estimator_parameters": {
+        "algorithm": "auto",
+        "leaf_size": 30,
+        "metric": "minkowski",
+        "metric_params": null,
+        "n_jobs": null,
+        "n_neighbors": 5,
+        "p": 2,
+        "weights": "uniform"
+      },
+      "parameter_grid": {
+        "selector__k": [
+          5,
+          10,
+          20
+        ],
+        "model__n_neighbors": [
+          3,
+          5,
+          7,
+          9
+        ],
+        "model__weights": [
+          "uniform",
+          "distance"
+        ],
+        "model__p": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "xgboost",
+      "scale_features": false,
+      "estimator_parameters": {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": null,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": true,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": null,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": null,
+        "max_leaves": null,
+        "min_child_weight": null,
+        "missing": NaN,
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": null,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 42,
+        "reg_alpha": null,
+        "reg_lambda": null,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": null,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      },
+      "parameter_grid": {
+        "selector__k": [
+          10,
+          20,
+          "all"
+        ],
+        "model__n_estimators": [
+          100,
+          300
+        ],
+        "model__max_depth": [
+          1,
+          2
+        ],
+        "model__learning_rate": [
+          0.03,
+          0.1
+        ],
+        "model__min_child_weight": [
+          1,
+          3
+        ]
+      }
+    }
+  ],
+  "finished_at_utc": "2026-09-23T18:37:08.773293+00:00",
+  "duration_seconds": 109.281062,
+  "outputs": {
+    "metrics": "results/metrics/nested_cv_fold_metrics.csv",
+    "predictions": "results/predictions/nested_cv_predictions.csv",
+    "summary": "results/summary/model_comparison_summary.csv",
+    "selected_features": "results/selected_features/nested_cv_selected_features.csv"
+  }
+}

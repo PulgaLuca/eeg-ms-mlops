@@ -35,41 +35,19 @@ def main() -> None:
     outliers = robust_outlier_report(subject_summary)
     paired = condition_differences(subject_summary)
 
-    subject_summary.to_parquet(
-        QC_TABLES / "subject_level_summary.parquet",
-        index=False,
-    )
+    subject_summary.to_parquet(QC_TABLES/"subject_level_summary.parquet", index=False,)
+    missingness.to_csv(QC_TABLES/"missingness_summary.csv", index=False,)
+    outliers.to_csv(QC_TABLES/"technical_outlier_candidates.csv", index=False,)
+    paired.to_parquet(QC_TABLES/"condition_differences.parquet",index=False,)
 
-    missingness.to_csv(
-        QC_TABLES / "missingness_summary.csv",
-        index=False,
-    )
-
-    outliers.to_csv(
-        QC_TABLES / "technical_outlier_candidates.csv",
-        index=False,
-    )
-
-    paired.to_parquet(
-        QC_TABLES / "condition_differences.parquet",
-        index=False,
-    )
-
-    plot_group_balance(
-        subjects,
-        QC_FIGURES / "group_balance.png",
-    )
-
+    plot_group_balance(subjects, QC_FIGURES/"group_balance.png",)
     plot_subject_distributions(
         subject_summary,
         measure="relative_power",
         band="alpha",
         spatial_level="roi",
         condition="CE",
-        output_path=(
-            QC_FIGURES
-            / "alpha_relative_roi_ce_distribution.png"
-        ),
+        output_path=(QC_FIGURES/"alpha_relative_roi_ce_distribution.png"),
     )
 
     plot_condition_differences(
@@ -77,10 +55,7 @@ def main() -> None:
         measure="relative_power",
         band="alpha",
         spatial_level="roi",
-        output_path=(
-            QC_FIGURES
-            / "alpha_relative_roi_ce_minus_oe.png"
-        ),
+        output_path=(QC_FIGURES/"alpha_relative_roi_ce_minus_oe.png"),
     )
 
     correlations = subject_correlation_matrix(
@@ -89,14 +64,9 @@ def main() -> None:
         spatial_level="roi",
     )
 
-    correlations.to_csv(
-        QC_TABLES / "roi_correlations_ce.csv"
-    )
+    correlations.to_csv(QC_TABLES/"roi_correlations_ce.csv")
 
-    plot_correlation_heatmap(
-        correlations,
-        QC_FIGURES / "roi_correlations_ce.png",
-    )
+    plot_correlation_heatmap(correlations, QC_FIGURES / "roi_correlations_ce.png",)
 
     print(f"Soggetti: {subjects.shape[0]}")
     print(f"Righe canoniche: {canonical.shape[0]:,}")

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ run.run_id }} | Run Dashboard{% endblock %}
+{% block content %}
+<main>
+  <a class="back" href="{{ url_for('index') }}">&larr; Tutti i run</a>
+  <section class="detail-head">
+    <div><p class="eyebrow">Run detail</p><h1>{{ run.run_id }}</h1><p class="lede">{{ run.started_at }} · durata {{ run.duration }}</p></div>
+    <span class="status {{ run.status }} large">{{ run.status }}</span>
+  </section>
+
+  {% if metadata.error %}<div class="alert"><strong>{{ metadata.error.type }}</strong><span>{{ metadata.error.message }}</span></div>{% endif %}
+
+  <section class="detail-grid">
+    <article class="panel"><div class="panel-title"><span class="icon">01</span><div><p class="eyebrow">Dataset</p><h2>Input del run</h2></div></div><div class="facts"><div><span>Soggetti</span><b>{{ run.n_subjects }}</b></div><div><span>MS</span><b>{{ run.n_ms }}</b></div><div><span>HC</span><b>{{ run.n_hc }}</b></div><div><span>Commit</span><b class="mono">{{ metadata.git.commit[:8] if metadata.git.commit else '-' }}</b></div></div><ul class="file-list">{% for name, item in inputs.items() %}<li><span>{{ name }}</span><small>{{ (item.size_bytes / 1024)|round(1) if item.size_bytes else '-' }} KB · {{ item.sha256[:10] if item.sha256 else '-' }}</small></li>{% endfor %}</ul></article>
+    <article class="panel"><div class="panel-title"><span class="icon">02</span><div><p class="eyebrow">Protocollo</p><h2>Validazione</h2></div></div><div class="facts vertical"><div><span>Outer CV</span><b>{{ metadata.validation_config.outer_n_splits }} fold × {{ metadata.validation_config.outer_n_repeats }} repeat</b></div><div><span>Inner CV</span><b>{{ metadata.validation_config.inner_n_splits }} fold</b></div><div><span>Metric selezione</span><b>{{ metadata.validation_config.primary_metric }}</b></div><div><span>Seed</span><b>{{ metadata.validation_config.random_seed }}</b></div></div></article>
+  </section>
+
+  <section class="section-head"><div><p class="eyebrow">Performance</p><h2>Confronto modelli</h2></div><span class="muted">medie sui fold outer</span></section>
+  {% if run.models %}<div class="table-wrap"><table><thead><tr><th>Modello</th><th>ROC-AUC</th><th>Avg precision</th><th>Balanced acc.</th><th>Sensibilita</th><th>Specificita</th><th>F1</th></tr></thead><tbody>{% for model in run.models %}<tr><td><span class="model-tag {{ 'channel' if model.model.startswith('channel') else 'roi' }}">{{ model.model.split('__')[0] }}</span><strong>{{ model.model.split('__', 1)[1] }}</strong></td><td>{{ model.roc_auc|metric }}</td><td>{{ model.average_precision|metric }}</td><td class="key">{{ model.balanced_accuracy|metric }}</td><td>{{ model.sensitivity|metric }}</td><td>{{ model.specificity|metric }}</td><td>{{ model.f1|metric }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty compact"><p>Metriche non disponibili per questo run.</p></div>{% endif %}
+
+  <section class="section-head"><div><p class="eyebrow">Traceability</p><h2>Modelli e iperparametri</h2></div></section>
+  <div class="catalog">{% for model in model_catalog %}<details><summary><span>{{ model.name }}</span><small>{{ 'scaling attivo' if model.scale_features else 'scaling disattivo' }}</small></summary><div class="param-grid"><div><label>Estimator</label><pre>{{ model.estimator_parameters|tojson(indent=2) }}</pre></div><div><label>Grid search</label><pre>{{ model.parameter_grid|tojson(indent=2) }}</pre></div></div></details>{% endfor %}</div>
+
+  <section class="section-head"><div><p class="eyebrow">Exports</p><h2>File del run</h2></div></section>
+  <div class="downloads"><a href="{{ url_for('run_file', run_id=run.run_id, relative_path='results/metrics/nested_cv_fold_metrics.csv') }}">Metriche fold</a><a href="{{ url_for('run_file', run_id=run.run_id, relative_path='results/metrics/model_comparison_summary.csv') }}">Summary modelli</a><a href="{{ url_for('run_file', run_id=run.run_id, relative_path='results/predictions/nested_cv_predictions.csv') }}">Predizioni OOF</a><a href="{{ url_for('run_file', run_id=run.run_id, relative_path='results/selected_features/nested_cv_selected_features.csv') }}">Feature selezionate</a></div>
+</main>
+{% endblock %}

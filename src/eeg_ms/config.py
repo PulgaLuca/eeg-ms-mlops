@@ -20,6 +20,8 @@ SUBJECTS_DATA = DATA_PROCESSED / "subjects.csv"
 REPORTS = ROOT / "reports"
 FIGURES = REPORTS / "figures"
 ARTIFACTS = ROOT / "artifacts"
+RUNS_DIR = ARTIFACTS / "runs"
+LATEST_RUN_FILE = RUNS_DIR / "latest_run.txt"
 
 QC_TABLES = REPORTS / "tables"
 QC_FIGURES = REPORTS / "figures" / "quality_control"
@@ -33,6 +35,9 @@ OUTER_FOLDS_FILE = SPLITS_DIR / "outer_test_folds.csv"
 FEATURE_CONFIGS = CONFIGS / "features"
 
 SUBJECT_FEATURES_ROI = DATA_PROCESSED / "subject_features_roi.parquet"
+SUBJECT_FEATURES_ROI_CSV = DATA_PROCESSED / "subject_features_roi.csv"
+SUBJECT_FEATURES_CHANNEL = DATA_PROCESSED / "subject_features_channel.parquet"
+SUBJECT_FEATURES_CHANNEL_CSV = DATA_PROCESSED / "subject_features_channel.csv"
 
 METRICS_DIR = ARTIFACTS / "metrics"
 PREDICTIONS_DIR = ARTIFACTS / "predictions"

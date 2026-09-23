@@ -1,12 +1,19 @@
-"""Costruzione della rappresentazione tabellare subject-level."""
+"""Costruzione della rappresentazione tabellare subject-level.
+Il modulo non addestra modelli, non crea gli split e non normalizza i dati.
+
+ROI: 32 soggetti, 504 feature;
+Channel: 32 soggetti, 2268 feature.
+"""
 
 from collections.abc import Sequence
 
 import pandas as pd
-
 from eeg_ms.config import (
     CANONICAL_DATA,
+    SUBJECT_FEATURES_CHANNEL,
+    SUBJECT_FEATURES_CHANNEL_CSV,
     SUBJECT_FEATURES_ROI,
+    SUBJECT_FEATURES_ROI_CSV,
     SUBJECTS_DATA,
 )
 
@@ -27,13 +34,10 @@ def aggregate_windows(
     """
     Calcola statistiche intra-soggetto sulle 18 finestre.
 
-    Non usa informazioni provenienti da altri soggetti e quindi
-    non causa leakage fra training e test.
+    Non usa informazioni provenienti da altri soggetti e quindi non causa leakage fra training e test.
     """
 
-    subset = canonical.loc[
-        canonical["spatial_level"].isin(spatial_levels)
-    ].copy()
+    subset = canonical.loc[canonical["spatial_level"].isin(spatial_levels)].copy()
 
     group_columns = [
         "subject_id",
@@ -59,9 +63,7 @@ def aggregate_windows(
         .reset_index()
     )
 
-    aggregated["iqr"] = (
-        aggregated["q75"] - aggregated["q25"]
-    )
+    aggregated["iqr"] = (aggregated["q75"] - aggregated["q25"])
 
     return aggregated
 
@@ -110,19 +112,12 @@ def create_condition_views(
     if "OE" not in paired.columns:
         paired["OE"] = pd.NA
 
-    paired["CE_minus_OE"] = (
-        paired["CE"] - paired["OE"]
-    )
+    paired["CE_minus_OE"] = (paired["CE"] - paired["OE"])
 
-    unavailable_views = (
-        set(condition_views) - set(paired.columns)
-    )
+    unavailable_views = (set(condition_views) - set(paired.columns))
 
     if unavailable_views:
-        raise ValueError(
-            f"Viste di condizione non disponibili: "
-            f"{sorted(unavailable_views)}"
-        )
+        raise ValueError(f"Viste di condizione non disponibili: {sorted(unavailable_views)}")
 
     condition_long = paired.melt(
         id_vars=index_columns,
@@ -166,11 +161,7 @@ def build_subject_feature_matrix(
     *,
     spatial_levels: Sequence[str] = ("roi",),
     statistics: Sequence[str] = ("median", "iqr"),
-    condition_views: Sequence[str] = (
-        "CE",
-        "OE",
-        "CE_minus_OE",
-    ),
+    condition_views: Sequence[str] = ("CE", "OE", "CE_minus_OE",),
 ) -> pd.DataFrame:
     """Produce una matrice con una sola riga per soggetto."""
 
@@ -185,18 +176,12 @@ def build_subject_feature_matrix(
         condition_views=condition_views,
     )
 
-    condition_frame = create_feature_names(
-        condition_frame
-    )
+    condition_frame = create_feature_names(condition_frame)
 
-    duplicated = condition_frame.duplicated(
-        ["subject_id", "feature_name"]
-    )
+    duplicated = condition_frame.duplicated(["subject_id", "feature_name"])
 
     if duplicated.any():
-        raise ValueError(
-            "Sono presenti feature duplicate per soggetto."
-        )
+        raise ValueError("Sono presenti feature duplicate per soggetto.")
 
     feature_matrix = (
         condition_frame
@@ -222,9 +207,7 @@ def build_subject_feature_matrix(
     )
 
     if result["subject_id"].duplicated().any():
-        raise ValueError(
-            "La matrice finale contiene soggetti duplicati."
-        )
+        raise ValueError("La matrice finale contiene soggetti duplicati.")
 
     feature_columns = [
         column
@@ -237,17 +220,10 @@ def build_subject_feature_matrix(
         }
     ]
 
-    completely_missing = [
-        column
-        for column in feature_columns
-        if result[column].isna().all()
-    ]
+    completely_missing = [column for column in feature_columns if result[column].isna().all()]
 
     if completely_missing:
-        raise ValueError(
-            "Feature interamente mancanti: "
-            f"{completely_missing[:10]}"
-        )
+        raise ValueError(f"Feature interamente mancanti: {completely_missing[:10]}")
 
     return result
 
@@ -256,38 +232,40 @@ def main() -> None:
     canonical = pd.read_parquet(CANONICAL_DATA)
     subjects = pd.read_csv(SUBJECTS_DATA)
 
-    subject_features = build_subject_feature_matrix(
-        canonical=canonical,
-        subjects=subjects,
-        spatial_levels=("roi",),
-        statistics=("median", "iqr"),
-        condition_views=(
-            "CE",
-            "OE",
-            "CE_minus_OE",
+    outputs = {
+        "roi": (SUBJECT_FEATURES_ROI, SUBJECT_FEATURES_ROI_CSV),
+        "channel": (
+            SUBJECT_FEATURES_CHANNEL,
+            SUBJECT_FEATURES_CHANNEL_CSV,
         ),
-    )
+    }
 
-    SUBJECT_FEATURES_ROI.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
+    for spatial_level, (parquet_path, csv_path) in outputs.items():
+        subject_features = build_subject_feature_matrix(
+            canonical=canonical,
+            subjects=subjects,
+            spatial_levels=(spatial_level,),
+            statistics=("median", "iqr"),
+            condition_views=("CE", "OE", "CE_minus_OE"),
+        )
 
-    subject_features.to_parquet(
-        SUBJECT_FEATURES_ROI,
-        index=False,
-        compression="zstd",
-    )
+        # Crea la matrice tabellare pronta per ML e la salva in entrambi i formati.
+        parquet_path.parent.mkdir(parents=True, exist_ok=True)
+        subject_features.to_parquet(
+            parquet_path,
+            index=False,
+            compression="zstd",
+        )
+        subject_features.to_csv(csv_path, index=False)
 
-    n_metadata_columns = 4
-    n_features = (
-        subject_features.shape[1] - n_metadata_columns
-    )
+        n_features = subject_features.shape[1] - 4
 
-    print(f"Soggetti: {subject_features.shape[0]}")
-    print(f"Feature: {n_features}")
-    print(f"Shape completa: {subject_features.shape}")
-    print(f"Output: {SUBJECT_FEATURES_ROI}")
+        print(f"Livello spaziale: {spatial_level}")
+        print(f"Soggetti: {subject_features.shape[0]}")
+        print(f"Feature: {n_features}")
+        print(f"Shape completa: {subject_features.shape}")
+        print(f"Output: {parquet_path}")
+        print(f"Output CSV: {csv_path}")
 
 
 if __name__ == "__main__":

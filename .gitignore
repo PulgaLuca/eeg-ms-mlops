@@ -2,6 +2,7 @@ data/raw/
 data/processed/
 data/metadata/
 reports/figures/
+report
 !data/raw/.gitkeep
 __pycache__/
 .venv/

@@ -287,9 +287,7 @@ def validate_canonical_dataset(frame: pd.DataFrame) -> None:
 
     missing_columns = set(CANONICAL_COLUMNS) - set(frame.columns)
     if missing_columns:
-        raise ValueError(
-            f"Colonne canoniche mancanti: {sorted(missing_columns)}"
-        )
+        raise ValueError(f"Colonne canoniche mancanti: {sorted(missing_columns)}")
 
     identity_columns = [
         "subject_id",
@@ -305,15 +303,9 @@ def validate_canonical_dataset(frame: pd.DataFrame) -> None:
     duplicated = frame.duplicated(identity_columns)
 
     if duplicated.any():
-        examples = frame.loc[
-            duplicated,
-            identity_columns,
-        ].head()
+        examples = frame.loc[duplicated, identity_columns,].head()
 
-        raise ValueError(
-            "Osservazioni canoniche duplicate:\n"
-            f"{examples.to_string(index=False)}"
-        )
+        raise ValueError(f"Osservazioni canoniche duplicate:\n {examples.to_string(index=False)}")
 
     target_counts = (
         frame[["subject_id", "target"]]
@@ -323,9 +315,7 @@ def validate_canonical_dataset(frame: pd.DataFrame) -> None:
     )
 
     if (target_counts != 1).any():
-        raise ValueError(
-            "Uno stesso subject_id è associato a target differenti."
-        )
+        raise ValueError("Uno stesso subject_id è associato a target differenti.")
 
     invalid_windows = ~frame["window"].between(1, N_WINDOWS)
     if invalid_windows.any():
@@ -333,3 +323,4 @@ def validate_canonical_dataset(frame: pd.DataFrame) -> None:
 
     if np.isinf(frame["value"]).any():
         raise ValueError("Il dataset contiene valori infiniti.")
+    
