@@ -1,9 +1,16 @@
-data/raw/
-data/processed/
-data/metadata/
-reports/figures/
-report
+# Generated datasets, reports and experiment artifacts
+artifacts/
+reports/
+data/
+
+# Keep the empty raw-data directory in the repository, without committing data
+!data/
+data/*
+!data/raw/
+data/raw/*
 !data/raw/.gitkeep
+
 __pycache__/
+.pytest_cache/
 .venv/
 .ipynb_checkpoints/
