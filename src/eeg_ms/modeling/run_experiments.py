@@ -31,6 +31,7 @@ import shutil
 import pandas as pd
 
 from eeg_ms.config import (
+    CONFIGS,
     METRICS_DIR,
     OUTER_FOLDS_FILE,
     PREDICTIONS_DIR,
@@ -74,6 +75,14 @@ def run_experiment() -> None:
         copy_input(input_path, run_dir, input_path.name)
 
     copy_input(VALIDATION_CONFIG, run_dir, VALIDATION_CONFIG.name)
+    for model_config_path in (
+        CONFIGS / "dummy.yaml",
+        CONFIGS / "logistic_elastic_net.yaml",
+        CONFIGS / "lda.yaml",
+        CONFIGS / "knn.yaml",
+        CONFIGS / "xgboost.yaml",
+    ):
+        copy_input(model_config_path, run_dir, model_config_path.name)
 
     model_specs = get_model_specifications(random_seed=config.random_seed)
     model_catalog = [

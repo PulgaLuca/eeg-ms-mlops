@@ -1,0 +1,3 @@
+modeling:
+	selector: f_classif
+	default_selector_k: 10
