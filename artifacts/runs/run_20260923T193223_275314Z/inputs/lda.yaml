@@ -1,9 +1,0 @@
-enabled: true
-scale_features: true
-
-estimator:
-  solver: lsqr
-
-parameter_grid:
-  selector__k: [5, 10, 20]
-  model__shrinkage: [auto, 0.1, 0.5, 0.9]

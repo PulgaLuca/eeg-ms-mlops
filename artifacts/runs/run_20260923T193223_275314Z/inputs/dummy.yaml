@@ -1,8 +1,0 @@
-enabled: true
-scale_features: false
-
-estimator:
-  strategy: prior
-
-parameter_grid:
-  selector__k: [all]
