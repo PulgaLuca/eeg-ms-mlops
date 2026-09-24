@@ -1,0 +1,13 @@
+enabled: true
+scale_features: false
+
+estimator:
+  class_weight: balanced
+  n_jobs: 1
+
+parameter_grid:
+  selector__k: [5, 10, 20, all]
+  model__n_estimators: [100, 300]
+  model__max_depth: [null, 5, 10]
+  model__min_samples_leaf: [1, 2, 4]
+  model__max_features: [sqrt, log2]

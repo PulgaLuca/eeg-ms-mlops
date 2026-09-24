@@ -1,0 +1,12 @@
+enabled: true
+scale_features: true
+
+estimator:
+  probability: true
+  class_weight: balanced
+
+parameter_grid:
+  selector__k: [5, 10, 20, all]
+  model__C: [0.01, 0.1, 1.0, 10.0]
+  model__kernel: [linear, rbf]
+  model__gamma: [scale, auto]

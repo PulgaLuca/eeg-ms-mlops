@@ -442,7 +442,62 @@ KNeighborsClassifier()
 - Feature scaling
 - Cattura la non-linearità
 
-### 4. XGBoost - balances classes
+### 4. Random Forest
+
+**Nome**: `random_forest`
+
+```python
+RandomForestClassifier(
+   class_weight="balanced",
+   random_state=42,
+   n_jobs=1
+)
+```
+
+**Spazio parametri**:
+```python
+{
+   "selector__k": [5, 10, 20, "all"],
+   "model__n_estimators": [100, 300],
+   "model__max_depth": [None, 5, 10],
+   "model__min_samples_leaf": [1, 2, 4],
+   "model__max_features": ["sqrt", "log2"]
+}
+```
+
+**Caratteristiche**:
+- Ensemble di alberi decisionali indipendenti
+- Gestisce relazioni non lineari senza feature scaling
+- `class_weight="balanced"` gestisce lo squilibrio tra classi
+
+### 5. Support Vector Machine (SVM)
+
+**Nome**: `svm`
+
+```python
+SVC(
+   probability=True,
+   class_weight="balanced",
+   random_state=42
+)
+```
+
+**Spazio parametri**:
+```python
+{
+   "selector__k": [5, 10, 20, "all"],
+   "model__C": [0.01, 0.1, 1.0, 10.0],
+   "model__kernel": ["linear", "rbf"],
+   "model__gamma": ["scale", "auto"]
+}
+```
+
+**Caratteristiche**:
+- Supporta separatori lineari e non lineari tramite kernel
+- `probability=True` consente di calcolare le probabilità per ROC-AUC
+- Richiede feature scaling
+
+### 6. XGBoost - balances classes
 
 ```python
 BalancedXGBClassifier(

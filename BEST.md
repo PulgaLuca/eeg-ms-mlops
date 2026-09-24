@@ -7,28 +7,29 @@ I risultati riportati provengono da 32 soggetti e confrontano gli stessi algorit
 - `roi__`: feature aggregate a livello di Region Of Interest;
 - `channel__`: feature mantenute a livello dei singoli canali.
 
-La conclusione principale è prudente: **nessun modello mostra ancora una capacità diagnostica sufficientemente solida per un uso clinico**. Le prestazioni sono solo moderatamente superiori, o talvolta inferiori, a una classificazione casuale. Il risultato migliore dipende dalla metrica considerata:
+**Attualmente con i dati in essere, nessun modello mostra ancora una capacità diagnostica sufficientemente solida**. 
+Le prestazioni sono solo moderatamente superiori, o talvolta inferiori, a una classificazione casuale. 
+Il risultato migliore dipende dalla metrica considerata:
 
 - `channel__xgboost` ha la migliore capacità discriminativa probabilistica: ROC-AUC `0.609` e average precision `0.862`;
-- `roi__xgboost` ha la migliore balanced accuracy (`0.583`) e la migliore sensibilità (`0.792`);
-- entrambi hanno una specificità bassa (`0.375`), quindi classificano erroneamente molti controlli sani come soggetti MS.
-
-Non è quindi corretto indicare un vincitore assoluto senza prima stabilire quale obiettivo sia prioritario: discriminazione generale, sensibilità clinica, specificità o calibrazione delle probabilità.
+- `roi__xgboost` ha la migliore balanced accuracy `0.583` e la migliore sensibilità `0.792`;
+- entrambi hanno una specificità bassa `0.375`, quindi classificano erroneamente molti controlli sani come soggetti MS.
 
 ## Lettura delle metriche
 
 ### ROC-AUC
 
-La ROC-AUC misura quanto il modello ordina correttamente i soggetti MS sopra i soggetti HC al variare della soglia.
+La metrica ROC-AUC misura quanto il modello ordina correttamente i soggetti MS sopra i soggetti HC al variare della soglia.
 
-- `channel__xgboost`: `0.609`, il valore migliore;
+- `channel__xgboost`: `0.609`, attualmente best;
 - `roi__xgboost`: `0.536`;
 - `channel__knn`: `0.464`;
 - `roi__logistic_elastic_net`: `0.484`.
 
-Un valore di `0.5` equivale, in prima approssimazione, a un ordinamento casuale. Di conseguenza, `channel__xgboost` mostra un segnale potenzialmente interessante, ma ancora debole. Una AUC di `0.609` non è sufficiente per sostenere che il modello abbia capacità diagnostica affidabile.
+Un valore di `0.5` equivale praticamente ad un ordinamento casuale. 
+Di conseguenza, `channel__xgboost` mostra un segnale potenzialmente interessante, ma ancora debole dovuto probabilmente alla natura del dataset a disposizione (ovvero 8HC e 24 MS). Una AUC di `0.609` non è sufficiente per sostenere che il modello abbia capacità diagnostica affidabile per il momento.
 
-I valori inferiori a `0.5`, come quelli di `channel__lda`, non dimostrano automaticamente che il modello sia inutile: possono indicare un ordinamento peggiore del caso, instabilità campionaria oppure una direzione delle probabilità non adeguata. In ogni caso sono un segnale di debolezza del modello nel setup attuale.
+I valori invece inferiori a `0.5`, come quelli di `channel__lda`, possono indicare un ordinamento peggiore del caso, instabilità campionaria o una direzione delle probabilità non adeguata.
 
 ### Average precision
 
@@ -36,19 +37,19 @@ L'average precision è influenzata dalla prevalenza della classe positiva. Nel d
 
 Pertanto:
 
-- `channel__xgboost`: `0.862`, miglioramento rispetto alla baseline;
-- `roi__xgboost`: `0.772`, miglioramento minimo;
-- `channel__knn`: `0.746`, praticamente baseline;
+- `channel__xgboost`: `0.862`, apparentemente buona ma da interpretare insieme alle altre metriche.
+- `roi__xgboost`: `0.772`, miglioramento minimo.
+- `channel__knn`: `0.746`, analogo a xgboost.
 - `roi__lda`: `0.829`, apparentemente buona ma da interpretare insieme alle altre metriche.
 
-Questo è un punto importante: un average precision elevato non è sufficiente da solo, soprattutto in presenza di classi sbilanciate. Va sempre confrontato con la baseline di prevalenza e con sensibilità, specificità e curve precision-recall.
+Alcune buone metriche di average precision provenienti dai vari algoritmi, non sono sufficiente da sole, soprattutto in presenza di classi sbilanciate, come nel nostro caso. Va sempre confrontato con la baseline di prevalenza e con sensibilità, specificità e curve precision-recall.
 
 ### Balanced accuracy
 
 La balanced accuracy è la media tra sensibilità e specificità:
 
 ```text
-balanced accuracy = (sensitivity + specificity) / 2
+balanced accuracy = (sensitivity + specificity)/2
 ```
 
 È più informativa dell'accuracy ordinaria quando le classi sono sbilanciate.
@@ -56,7 +57,7 @@ balanced accuracy = (sensitivity + specificity) / 2
 Il valore migliore è quello di `roi__xgboost`:
 
 ```text
-(0.792 + 0.375) / 2 = 0.5835 circa
+(0.792+0.375)/2 = 0.5835 circa
 ```
 
 Il risultato è soltanto moderatamente superiore a `0.5`, che rappresenta il riferimento di una classificazione non informativa in termini bilanciati. Questo significa che la buona sensibilità del modello è parzialmente compensata dalla bassa specificità.
@@ -77,17 +78,11 @@ Per uno screening preliminare potrebbe essere accettabile privilegiare la sensib
 
 ### F1 score
 
-I valori di F1 sono relativamente alti per alcuni modelli, per esempio `0.824` per `channel__knn`. Tuttavia non devono essere letti isolatamente: con una prevalenza MS del 75%, un modello può ottenere un F1 positivo discreto concentrandosi sulla classe maggioritaria e trascurando la specificità.
+I valori di F1 sono relativamente alti per alcuni modelli, per esempio `0.824` per `channel__knn`. Tuttavia non devono essere letti isolatamente.
+Con una prevalenza MS del 75%, un modello può ottenere un F1 positivo discreto concentrandosi sulla classe maggioritaria e trascurando la specificità.
 
-Il caso `dummy` è istruttivo: ha F1 `0.857`, sensibilità `1.0` e specificità `0.0`, pur avendo ROC-AUC `0.5` e balanced accuracy `0.5`. Questo dimostra che F1, se calcolato soprattutto sulla classe positiva, può apparire buono anche quando il modello non distingue correttamente HC e MS.
+Il caso `dummy` ha F1 `0.857`, sensibilità `1.0` e specificità `0.0`, pur avendo ROC-AUC `0.5` e balanced accuracy `0.5`. Questo dimostra che F1, se calcolato soprattutto sulla classe positiva, può apparire buono anche quando il modello non distingue correttamente HC e MS.
 
-### Brier score
-
-Il Brier score misura la qualità delle probabilità predette: più è basso, meglio le probabilità sono calibrate rispetto agli esiti osservati.
-
-Il valore più basso è quello dei modelli `dummy` (`0.1875`), ma questo non significa che siano i migliori classificatori. Il dummy sfrutta la prevalenza elevata della classe MS e produce probabilità costanti vicine a `0.75`; può quindi essere ben calibrato globalmente senza discriminare i singoli soggetti.
-
-Il Brier score deve quindi essere interpretato insieme a ROC-AUC, curve di calibrazione e capacità di separare le classi. Non è una metrica sufficiente per scegliere il modello.
 
 ## Confronto ROI contro channel
 
@@ -107,9 +102,8 @@ Questo suggerisce che l'aggregazione spaziale in ROI può ridurre il rumore e re
 
 - la migliore ROC-AUC (`0.609`);
 - la migliore average precision (`0.862`);
-- un Brier score migliore di `roi__xgboost` (`0.230` contro `0.232`, differenza comunque piccola).
 
-Questo suggerisce che i canali conservano informazione spaziale più dettagliata, che XGBoost riesce almeno parzialmente a sfruttare.
+Questo suggerisce che i canali conservano informazione spaziale più dettagliata, che XGBoost riesce almeno parzialmente a sfruttare, seppur con pochi campioni.
 
 ### Attenzione al numero di feature
 

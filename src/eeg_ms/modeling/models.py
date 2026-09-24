@@ -10,6 +10,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 from eeg_ms.config import CONFIGS
 from eeg_ms.modeling.xgboost_balanced import BalancedXGBClassifier
@@ -112,6 +114,30 @@ def get_model_specifications(
                 "knn",
                 KNeighborsClassifier(**knn_config["estimator"]),
                 knn_config,
+            )
+        )
+
+    random_forest_config = _load_model_config("random_forest")
+    if random_forest_config:
+        estimator_parameters = dict(random_forest_config["estimator"])
+        estimator_parameters["random_state"] = random_seed
+        specifications.append(
+            _build_specification(
+                "random_forest",
+                RandomForestClassifier(**estimator_parameters),
+                random_forest_config,
+            )
+        )
+
+    svm_config = _load_model_config("svm")
+    if svm_config:
+        estimator_parameters = dict(svm_config["estimator"])
+        estimator_parameters["random_state"] = random_seed
+        specifications.append(
+            _build_specification(
+                "svm",
+                SVC(**estimator_parameters),
+                svm_config,
             )
         )
 

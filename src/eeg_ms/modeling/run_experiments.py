@@ -80,6 +80,8 @@ def run_experiment() -> None:
         CONFIGS / "logistic_elastic_net.yaml",
         CONFIGS / "lda.yaml",
         CONFIGS / "knn.yaml",
+        CONFIGS / "random_forest.yaml",
+        CONFIGS / "svm.yaml",
         CONFIGS / "xgboost.yaml",
     ):
         copy_input(model_config_path, run_dir, model_config_path.name)
