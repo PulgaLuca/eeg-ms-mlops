@@ -94,7 +94,7 @@ Il risultato non è sufficiente per concludere che una rappresentazione sia più
 
 Le feature channel potrebbero conservare segnale utile per l'ordinamento, ma il risultato non dimostra un vantaggio generale della rappresentazione channel: la ROC-AUC pooled ha un intervallo ampio e la specificità alla soglia usata è quasi nulla.
 
-### Attenzione al numero di feature
+### Numero di feature eelvato per soggetto
 
 La matrice ROI contiene circa 504 feature, mentre la matrice channel ne contiene circa 2268, a fronte di soli 32 soggetti. Il rapporto feature/soggetti è quindi molto elevato, soprattutto per channel.
 
@@ -132,13 +132,6 @@ La maggior parte delle ROC-AUC è vicina a `0.5`. Anche il miglior valore medio 
 Non si dovrebbe descrivere il modello come diagnostico sulla base di questa tabella. Al massimo si può parlare di segnale preliminare da verificare su dati più numerosi e indipendenti.
 
 
-### Possibile instabilità della selezione delle feature
-
-Le feature vengono selezionate in ciascun fold, correttamente evitando di usare il test fold. Tuttavia, con pochi soggetti, la selezione può cambiare molto da un fold all'altro.
-
-Una feature selezionata una sola volta non dovrebbe essere interpretata come biomarker affidabile. Serve misurare la frequenza di selezione e la sua stabilità tra ripetizioni.
-
-
 ## Miglioramenti prioritari
 
 ### 1. Aumentare il numero di soggetti
@@ -153,6 +146,6 @@ Per la rappresentazione channel è opportuno testare:
 - regolarizzazione più forte;
 - eliminazione di feature fortemente ridondanti;
 
-## Conclusione operativa
+## Conclusione
 
 `channel__svm` ha i migliori valori medi di ROC-AUC e average precision, mentre `channel__xgboost` ha la balanced accuracy media più alta e la specificità più alta (a pari merito con `roi__logistic_elastic_net`). `roi__svm` ottiene la sensibilità più alta ma quasi non riconosce i sani. 
