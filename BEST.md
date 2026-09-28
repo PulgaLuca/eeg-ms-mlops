@@ -1,5 +1,7 @@
 # Commento ai risultati e direzioni di miglioramento
 
+I risultati qui discussi si riferiscono all'ultimo run completato, `run_20260924T124737_646339Z` (nested cross-validation con 5 ripetizioni esterne e 4 fold per ripetizione). I valori principali sono le medie delle metriche sui 20 fold esterni; dove indicato, sono riportati separatamente anche i risultati pooled ottenuti aggregando le predizioni out-of-fold a livello di soggetto.
+
 ## Sintesi
 
 I risultati riportati provengono da 32 soggetti e confrontano gli stessi algoritmi su due rappresentazioni spaziali EEG:
@@ -7,60 +9,46 @@ I risultati riportati provengono da 32 soggetti e confrontano gli stessi algorit
 - `roi__`: feature aggregate a livello di Region Of Interest;
 - `channel__`: feature mantenute a livello dei singoli canali.
 
-**Attualmente con i dati in essere, nessun modello mostra ancora una capacità diagnostica sufficientemente solida**. 
-Le prestazioni sono solo moderatamente superiori, o talvolta inferiori, a una classificazione casuale. 
-Il risultato migliore dipende dalla metrica considerata:
+**Con i dati disponibili, nessun modello mostra ancora una capacità diagnostica sufficientemente solida.** Le prestazioni variano molto tra i fold e restano vicine a una classificazione non informativa. Nel riepilogo medio dei 20 fold:
 
-- `channel__xgboost` ha la migliore capacità discriminativa probabilistica: ROC-AUC `0.609` e average precision `0.862`;
-- `roi__xgboost` ha la migliore balanced accuracy `0.583` e la migliore sensibilità `0.792`;
-- entrambi hanno una specificità bassa `0.375`, quindi classificano erroneamente molti controlli sani come soggetti MS.
+- `channel__svm` ha la ROC-AUC media più alta (`0.588`) e la average precision media più alta (`0.858`), ma la specificità media è appena `0.075`;
+- `channel__xgboost` ha la balanced accuracy media migliore (`0.538`), con sensibilità `0.675` e specificità `0.400`;
+- `roi__svm` raggiunge la sensibilità media più alta (`0.950`), ma specificità `0.025`.
+
 
 ## Lettura delle metriche
 
 ### ROC-AUC
 
-La metrica ROC-AUC misura quanto il modello ordina correttamente i soggetti MS sopra i soggetti HC al variare della soglia.
+La metrica ROC-AUC misura quanto il modello ordina correttamente i soggetti MS sopra i soggetti HC al variare della soglia. Nel riepilogo medio dei fold, il valore maggiore è quello di `channel__svm` (`0.588`, deviazione standard `0.243`), seguito da `channel__xgboost` (`0.544`, DS `0.240`). Per `channel__svm`, la stima pooled per soggetto è `0.594`, con IC bootstrap 95% `0.365-0.807`.
 
-- `channel__xgboost`: `0.609`, attualmente best;
-- `roi__xgboost`: `0.536`;
-- `channel__knn`: `0.464`;
-- `roi__logistic_elastic_net`: `0.484`.
-
-Un valore di `0.5` equivale praticamente ad un ordinamento casuale. 
-Di conseguenza, `channel__xgboost` mostra un segnale potenzialmente interessante, ma ancora debole dovuto probabilmente alla natura del dataset a disposizione (ovvero 8HC e 24 MS). Una AUC di `0.609` non è sufficiente per sostenere che il modello abbia capacità diagnostica affidabile per il momento.
-
-I valori invece inferiori a `0.5`, come quelli di `channel__lda`, possono indicare un ordinamento peggiore del caso, instabilità campionaria o una direzione delle probabilità non adeguata.
+Un valore di `0.5` equivale, praticamente, a un ordinamento casuale. Anche il valore medio migliore è quindi solo moderatamente superiore al caso, e la sua variabilità tra fold è elevata. L'intervallo pooled di `channel__svm` comprende `0.5`, perciò non sostiene una capacità discriminativa affidabile. Valori inferiori a `0.5` in alcune stime aggregate possono riflettere instabilità campionaria o una direzione delle probabilità non adeguata.
 
 ### Average precision
 
-L'average precision è influenzata dalla prevalenza della classe positiva. Nel dataset la prevalenza MS è `24/32 = 0.75`, quindi una baseline che predicesse sempre la prevalenza ha average precision circa `0.75`.
+L'average precision è influenzata dalla prevalenza della classe positiva. Nel dataset la prevalenza MS è `24/32 = 0.75`, quindi il riferimento non informativo è circa `0.75`.
 
-Pertanto:
+Nel riepilogo medio dei fold, `channel__svm` ha il valore più alto (`0.858`), seguito da `channel__lda` (`0.828`) e `channel__logistic_elastic_net` (`0.828`). Il valore di `channel__svm` è superiore alla baseline, ma nell'analisi pooled per soggetto è `0.847` (IC bootstrap 95% `0.757-0.932`): il risultato va comunque interpretato insieme alla bassa specificità e alle altre metriche.
 
-- `channel__xgboost`: `0.862`, apparentemente buona ma da interpretare insieme alle altre metriche.
-- `roi__xgboost`: `0.772`, miglioramento minimo.
-- `channel__knn`: `0.746`, analogo a xgboost.
-- `roi__lda`: `0.829`, apparentemente buona ma da interpretare insieme alle altre metriche.
-
-Alcune buone metriche di average precision provenienti dai vari algoritmi, non sono sufficiente da sole, soprattutto in presenza di classi sbilanciate, come nel nostro caso. Va sempre confrontato con la baseline di prevalenza e con sensibilità, specificità e curve precision-recall.
+Valori elevati di average precision non sono sufficienti da soli, soprattutto in presenza di classi sbilanciate. Vanno confrontati con la baseline di prevalenza e interpretati insieme a sensibilità, specificità e curve precision-recall.
 
 ### Balanced accuracy
 
 La balanced accuracy è la media tra sensibilità e specificità:
 
 ```text
-balanced accuracy = (sensitivity + specificity)/2
+balanced accuracy =(sensitivity+specificity)/2
 ```
 
 È più informativa dell'accuracy ordinaria quando le classi sono sbilanciate.
 
-Il valore migliore è quello di `roi__xgboost`:
+La media fold-wise più alta è quella di `channel__xgboost`:
 
 ```text
-(0.792+0.375)/2 = 0.5835 circa
+(0.675+0.400)/2 = 0.5375 circa
 ```
 
-Il risultato è soltanto moderatamente superiore a `0.5`, che rappresenta il riferimento di una classificazione non informativa in termini bilanciati. Questo significa che la buona sensibilità del modello è parzialmente compensata dalla bassa specificità.
+Il risultato è solo poco superiore a `0.5`, riferimento di una classificazione non informativa in termini bilanciati, e presenta una deviazione standard tra fold di `0.224`. Sulle predizioni pooled, la balanced accuracy di `channel__xgboost` è `0.604` (IC 95% `0.438-0.792`); questa è una stima diversa dalla media fold-wise e non va sostituita ad essa nel confronto tra modelli.
 
 ### Sensibilità e specificità
 
@@ -68,17 +56,17 @@ La sensibilità misura quanti soggetti MS vengono riconosciuti correttamente. La
 
 | Modello | Sensibilità | Specificità | Interpretazione |
 |---|---:|---:|---|
-| `roi__xgboost` | 0.792 | 0.375 | Riconosce molti MS, ma genera molti falsi positivi HC |
-| `channel__knn` | 0.875 | 0.250 | Sensibilità alta, specificità molto bassa |
-| `channel__xgboost` | 0.708 | 0.375 | Compromesso leggermente migliore in termini probabilistici |
-| `roi__lda` | 0.708 | 0.250 | Prestazione sbilanciata verso la sensibilità |
-| `channel__lda` | 0.750 | 0.250 | Molti MS rilevati, molti HC classificati erroneamente |
+| `channel__svm` | 0.917 | 0.075 | Sensibilità alta, ma riconosce correttamente pochissimi HC |
+| `roi__svm` | 0.950 | 0.025 | Sensibilità media più alta, specificità quasi nulla |
+| `channel__xgboost` | 0.675 | 0.400 | Specificità media più alta, con sensibilità moderata |
+| `roi__xgboost` | 0.667 | 0.350 | Sensibilità e specificità entrambe limitate |
+| `roi__knn` | 0.758 | 0.175 | Sensibilità elevata, specificità bassa |
 
-Per uno screening preliminare potrebbe essere accettabile privilegiare la sensibilità, ma questa scelta deve essere esplicita. Per un uso diagnostico, una specificità pari a `0.25` o `0.375` è un problema serio: rispettivamente il 75% o il 62.5% dei controlli sani verrebbe classificato come MS nel riepilogo considerato.
+Per uno screening preliminare potrebbe essere accettabile privilegiare la sensibilità, ma la scelta deve essere esplicita. Le specificità medie tra `0.025` e `0.400` implicano molti falsi positivi tra i controlli; inoltre le specificità sono medie fold-wise e non rappresentano una singola matrice di confusione.
 
 ### F1 score
 
-I valori di F1 sono relativamente alti per alcuni modelli, per esempio `0.824` per `channel__knn`. Tuttavia non devono essere letti isolatamente.
+I valori di F1 sono relativamente alti per alcuni modelli: per esempio `0.831` per `roi__svm` e `0.819` per `channel__svm`, tra i classificatori non dummy. Tuttavia non devono essere letti isolatamente.
 Con una prevalenza MS del 75%, un modello può ottenere un F1 positivo discreto concentrandosi sulla classe maggioritaria e trascurando la specificità.
 
 Il caso `dummy` ha F1 `0.857`, sensibilità `1.0` e specificità `0.0`, pur avendo ROC-AUC `0.5` e balanced accuracy `0.5`. Questo dimostra che F1, se calcolato soprattutto sulla classe positiva, può apparire buono anche quando il modello non distingue correttamente HC e MS.
@@ -86,24 +74,25 @@ Il caso `dummy` ha F1 `0.857`, sensibilità `1.0` e specificità `0.0`, pur aven
 
 ## Confronto ROI contro channel
 
-### Vantaggi osservati per ROI
-
-`roi__xgboost` ottiene:
-
-- la migliore balanced accuracy (`0.583`);
-- la migliore sensibilità (`0.792`);
-- una specificità uguale a quella di `channel__xgboost` (`0.375`).
-
-Questo suggerisce che l'aggregazione spaziale in ROI può ridurre il rumore e rendere più stabile il riconoscimento dei soggetti MS rispetto ai singoli canali, almeno alla soglia utilizzata.
-
-### Vantaggi osservati per channel
+### Balanced accuracy e specificità
 
 `channel__xgboost` ottiene:
 
-- la migliore ROC-AUC (`0.609`);
-- la migliore average precision (`0.862`);
+- la migliore balanced accuracy media sui fold (`0.538`);
+- la specificità media più alta (`0.400`), a pari merito con `roi__logistic_elastic_net`;
+- una balanced accuracy pooled per soggetto pari a `0.604` (IC bootstrap 95% `0.438-0.792`).
 
-Questo suggerisce che i canali conservano informazione spaziale più dettagliata, che XGBoost riesce almeno parzialmente a sfruttare, seppur con pochi campioni.
+Il risultato non è sufficiente per concludere che una rappresentazione sia più stabile o più informativa: la variabilità tra fold è ampia e l'intervallo bootstrap pooled è largo.
+
+### Vantaggi osservati per channel
+
+`channel__svm` ottiene:
+
+- la migliore ROC-AUC media sui fold (`0.588`);
+- la migliore average precision media sui fold (`0.858`);
+- sensibilità media elevata (`0.917`), ma specificità molto bassa (`0.075`).
+
+Le feature channel potrebbero conservare segnale utile per l'ordinamento, ma il risultato non dimostra un vantaggio generale della rappresentazione channel: la ROC-AUC pooled ha un intervallo ampio e la specificità alla soglia usata è quasi nulla.
 
 ### Attenzione al numero di feature
 
@@ -122,7 +111,7 @@ La differenza tra ROI e channel non va quindi interpretata soltanto come differe
 
 ### Campione molto piccolo
 
-Con 32 soggetti, una variazione di pochi soggetti cambia sensibilmente sensibilità e specificità. Per esempio, se ci sono 8 soggetti HC, una specificità di `0.375` corrisponde a circa 3 controlli corretti su 8.
+Con 32 soggetti, una variazione di pochi soggetti cambia sensibilmente sensibilità e specificità. Nel calcolo pooled, con 8 soggetti HC, una specificità di `0.375` corrisponde a 3 controlli corretti su 8.
 
 Le metriche hanno quindi una granularità elevata e intervalli di incertezza probabilmente ampi.
 
@@ -138,15 +127,10 @@ pur riconoscendo male i controlli sani. Per questo la balanced accuracy e la spe
 
 ### Prestazioni vicine al caso
 
-La maggior parte delle ROC-AUC è vicina a `0.5`. Anche il miglior risultato, `0.609`, è ancora lontano da una separazione robusta.
+La maggior parte delle ROC-AUC è vicina a `0.5`. Anche il miglior valore medio sui fold, `0.588` (`channel__svm`), è ancora lontano da una separazione robusta; la stima pooled corrispondente è `0.594` e il relativo intervallo bootstrap è ampio.
 
 Non si dovrebbe descrivere il modello come diagnostico sulla base di questa tabella. Al massimo si può parlare di segnale preliminare da verificare su dati più numerosi e indipendenti.
 
-### Assenza di incertezza statistica nella tabella
-
-La tabella presenta valori aggregati, ma non riporta intervalli di confidenza. La differenza tra `0.609` e `0.536`, oppure tra due balanced accuracy vicine, potrebbe non essere statisticamente significativa.
-
-Un ranking numerico non equivale a una dimostrazione che un modello sia realmente superiore a un altro.
 
 ### Possibile instabilità della selezione delle feature
 
@@ -154,107 +138,21 @@ Le feature vengono selezionate in ciascun fold, correttamente evitando di usare 
 
 Una feature selezionata una sola volta non dovrebbe essere interpretata come biomarker affidabile. Serve misurare la frequenza di selezione e la sua stabilità tra ripetizioni.
 
-### Rischio di leakage a monte
-
-La nested cross-validation protegge il training e la selezione degli iperparametri, ma non può correggere leakage già introdotto prima del training. È necessario verificare che:
-
-- le trasformazioni dipendenti dai dati siano state calcolate senza usare informazioni di tutti i soggetti in modo improprio;
-- eventuali normalizzazioni o selezioni non siano state eseguite prima degli split;
-- soggetti correlati o visite multiple non siano distribuiti tra train e test;
-- le finestre dello stesso soggetto non siano trattate come soggetti indipendenti.
 
 ## Miglioramenti prioritari
 
-### 1. Aggiungere intervalli di confidenza
-
-Calcolare intervalli di confidenza per:
-
-- ROC-AUC;
-- average precision;
-- balanced accuracy;
-- sensibilità;
-- specificità;
-- Brier score.
-
-Il bootstrap deve essere eseguito a livello di soggetto, non a livello di singola finestra o singola predizione duplicata. La scelta migliore tra ROI e channel dovrebbe essere basata anche sulla sovrapposizione degli intervalli.
-
-### 2. Aumentare il numero di soggetti
+### 1. Aumentare il numero di soggetti
 
 È il miglioramento più importante. Con 32 soggetti e 8 controlli sani, le metriche sono molto sensibili al caso.
 
-Sarebbe opportuno usare:
-
-- un campione HC più ampio;
-- dati provenienti da più acquisizioni;
-- un test set esterno indipendente;
-- possibilmente dati provenienti da un centro o sessione diversa.
-
-### 3. Ridurre il rischio di overfitting nei channel
+### 2. Ridurre il rischio di overfitting nei channel
 
 Per la rappresentazione channel è opportuno testare:
 
 - valori più restrittivi di `k` nella selezione delle feature;
 - regolarizzazione più forte;
-- riduzione dimensionale appresa dentro i fold, ad esempio PCA;
-- aggregazioni spaziali intermedie;
-- eliminazione di feature fortemente ridondanti, sempre dentro la validazione;
-- modelli più semplici come baseline primaria.
-
-Il confronto deve mantenere lo stesso protocollo di validazione per ROI e channel.
-
-### 4. Ottimizzare la soglia decisionale
-
-Tutte le metriche threshold-based dipendono dalla soglia `0.5`. Questa soglia non è necessariamente ottimale, soprattutto con classi sbilanciate.
-
-La soglia dovrebbe essere scelta dentro l'inner CV in base all'obiettivo:
-
-- massimizzare sensibilità per screening;
-- massimizzare specificità per ridurre falsi positivi;
-- ottimizzare balanced accuracy;
-- rispettare un vincolo clinico, per esempio sensibilità minima del 90%.
-
-La soglia non deve essere scelta osservando l'outer test set, altrimenti si introduce leakage nella valutazione.
-
-### 5. Valutare meglio la calibrazione
-
-Per le probabilità si dovrebbero produrre:
-
-- reliability diagram;
-- calibration slope e intercept;
-- Brier score con intervallo di confidenza;
-- confronto con la baseline di prevalenza.
-
-Il dummy deve rimanere un riferimento, non un concorrente diagnostico.
-
-### 6. Analizzare la stabilità delle feature
-
-Per ogni feature si può calcolare:
-
-- frequenza di selezione nei fold;
-- frequenza separata per ROI e channel;
-- distribuzione dell'importanza;
-- coerenza del segno dei coefficienti per i modelli lineari.
-
-Le feature più interessanti sono quelle selezionate frequentemente e con importanza relativamente stabile, non quelle che emergono da un singolo fold.
-
-### 7. Valutare la significatività del confronto ROI/channel
-
-Il confronto dovrebbe usare le predizioni sugli stessi soggetti e gli stessi fold. Possibili analisi:
-
-- bootstrap appaiato delle differenze di metriche;
-- confronto delle probabilità soggetto per soggetto;
-- test di permutazione;
-- analisi della differenza di balanced accuracy tra ROI e channel;
-- confronto delle curve ROC e Precision-Recall.
-
-Questo è preferibile al semplice confronto tra medie calcolate separatamente.
+- eliminazione di feature fortemente ridondanti;
 
 ## Conclusione operativa
 
-Il risultato più promettente è `channel__xgboost` se l'obiettivo è massimizzare la capacità di ranking e la qualità delle probabilità. Il risultato più equilibrato alla soglia corrente è `roi__xgboost`, grazie alla migliore balanced accuracy e sensibilità.
-
-Tuttavia, entrambi mostrano specificità bassa e prestazioni complessive ancora deboli. La conclusione corretta non è che channel sia definitivamente migliore di ROI, né che XGBoost sia già un classificatore clinico affidabile. La conclusione più difendibile è:
-
-> Le feature channel sembrano contenere un segnale discriminativo potenzialmente maggiore, evidenziato dal risultato di `channel__xgboost`, mentre la rappresentazione ROI offre una soluzione più compatta e una migliore sensibilità/balanced accuracy alla soglia corrente. La differenza deve essere verificata con intervalli di confidenza, analisi di stabilità e validazione esterna su un campione più ampio.
-
-Prima di utilizzare questi modelli in un contesto applicativo, le priorità sono aumentare il campione, quantificare l'incertezza, controllare la stabilità delle feature e definire la soglia sulla base dell'obiettivo clinico.
+`channel__svm` ha i migliori valori medi di ROC-AUC e average precision, mentre `channel__xgboost` ha la balanced accuracy media più alta e la specificità più alta (a pari merito con `roi__logistic_elastic_net`). `roi__svm` ottiene la sensibilità più alta ma quasi non riconosce i sani. 

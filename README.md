@@ -7,16 +7,14 @@
 
 ## Indice
 
-1. [Panoramica progetto](#panoramica-progetto)
-2. [Obiettivi scientifici](#obiettivi-scientifici)
-3. [Architettura Pipeline](#architettura-pipeline)
-4. [Dataset e dati](#dataset-e-dati)
-5. [Modelli utilizzati](#modelli-utilizzati)
-6. [Metriche e performance](#metriche-e-performance)
-7. [Risultati dettagliati](#risultati-dettagliati)
-8. [Come riprodurre il progetto](#come-riprodurre-il-progetto)
-9. [Interpretazione dei risultati](#interpretazione-dei-risultati)
-10. [Limitazioni e futuri sviluppi](#limitazioni-e-futuri-sviluppi)
+1. [Overview progetto](#overview)
+2. [Scientific goals](#scientific-goals)
+3. [Architettura Pipeline](#architettura-della-pipeline)
+4. [Modelli ML utilizzati](#modelli-ml)
+5. [Metriche e performance](#metriche-e-performance)
+6. [Risultati dettagliati](#risultati-dettagliati)
+7. [Come riprodurre il progetto](#come-setuppare-il-progetto)
+8. [Possibili miglioramenti o idee aggiuntive](#possibili-miglioramenti-o-idee-aggiuntive)
 
 ---
 
@@ -198,7 +196,7 @@ In questo progetto sono state prese in considerazione:
 
 ---
 
-### Pipeline steps
+## Pipeline steps
 
 #### **Step 1: Audit & Discovery**
 ```bash
@@ -306,13 +304,13 @@ python -m eeg_ms.modeling.run_experiments
 ```
 ┌─ OUTER LOOP (valutazione) ──────────┐
 │  5 Repeat × 4 Fold = 20 test-set    │
-│  Per ogni outer fold:                │
-│  ┌─ INNER LOOP (tuning) ──────────┐  │
-│  │ 4-fold GridSearchCV            │  │
-│  │ Cerca iperparametri ottimi     │  │
-│  │ su dati training               │  │
-│  └─────────────────────────────────┤  │
-│  Test su hold-out esterno          │  │
+│  Per ogni outer fold:               │
+│  ┌─ INNER LOOP (tuning) ──────────┐ │
+│  │ 4-fold GridSearchCV            │ │
+│  │ Cerca iperparametri ottimi     │ │
+│  │ su dati training               │ │
+│  └─────────────────────────────────┤│
+│  Test su hold-out esterno          ││
 └────────────────────────────────────┘
 ```
 
@@ -541,7 +539,8 @@ Pipeline([
 ```
 
 - Riduce dimensionalità
-- Riduce overfitting
+- Riduce overfitti
+Il modello dummy è escluso perché usa tutte le feature per costruzione.ng
 - Complessità computazionale minore
 
 ---
@@ -571,29 +570,6 @@ Per ogni fold (soggetti test):
 | **Mediana (median)** | Robustezza a outlier |
 | **Std Dev (std)** | Variabilità tra fold |
 
-### Risultati riassuntivi
-
-Basato su `artifacts/metrics/model_comparison_summary.csv`:
-
-```
-Model                  ROC-AUC      Balanced Acc  Sensitivity  F1
-                       (mean±std)   (mean±std)    (mean±std)   (mean±std)
-────────────────────────────────────────────────────────────────────
-dummy                  0.50±0.00    0.50±0.00     1.00±0.00    0.86±0.00
-                       Baseline: sempre predice "MS" (1)
-
-logistic_elastic_net   0.49±0.23    0.50±0.21     0.63±0.27    0.65±0.23
-                       Marginalmente migliore del baseline
-
-lda                    0.53±0.24    0.53±0.18     0.72±0.16    0.73±0.11
-                       Leggermente migliore
-
-knn                    0.49±0.23    0.51±0.16     0.82±0.13    0.78±0.09
-                       Elevata sensibilità ma squilibrata
-
-xgboost                0.48±0.22    0.49±0.17     0.65±0.22    0.67±0.16
-                       Simile al baseline
-```
 
 ### Analisi metriche per modello
 
@@ -727,7 +703,7 @@ xgboost                0.48±0.22    0.49±0.17     0.65±0.22    0.67±0.16
    - **Troppo pochi** per training robusto di modelli complessi
    - LDA e Logistic (lineari) teoricamente più adatti
 
-4. **Possibile Separabilità Bassa**
+4. **Possibile separabilità bassa**
    - ROC-AUC si aggira circa su 0.5 (50%) e suggerisce un **overlap distributions**
    - HC e MS **potrebbero non** essere chiaramente separabili da EEG
    - O le feature non catturano le vere differenze biologiche
@@ -759,11 +735,11 @@ xgboost                0.48±0.22    0.49±0.17     0.65±0.22    0.67±0.16
 #### **Clonazione e setup**
 
 ```bash
-# Clona repository
-git clone <repository-url>
+# Clona repository da Github
+git clone https://github.com/PulgaLuca/eeg-ms-mlops.git
 cd eeg-ms-mlops
 
-# Crea virtual environment
+# Dopo aver aperto un terminale, all'interno della cartella del progetto, crea il virtual environment per separare le librerie usate da questo progetto da quelle già installate
 python -m venv .venv
 
 # Attiva virtual environment
@@ -772,14 +748,13 @@ python -m venv .venv
 # MacOS/Linux:
 source .venv/bin/activate
 
-# Installa dipendenze
+# Installa le dipendenze
 pip install --upgrade pip
 pip install -e ".[dev]"
 ```
 
-Verifica installazione:
+Verifica installazione e setup cartelle con dati:
 ```bash
-python -c "import eeg_ms; print('Import OK')"
 pytest tests/  # test unitari
 ```
 
@@ -818,36 +793,6 @@ Soggetti: ...
 Output: data/processed/canonical_features.parquet
 ```
 
-**Verifica**:
-```bash
-python -c "
-import pandas as pd
-df = pd.read_parquet('data/processed/canonical_features.parquet')
-print(f'Shape: {df.shape}')
-print(f'Colonne: {df.columns.tolist()}')
-print(df.head())
-"
-```
-
-**Controllo qualità**:
-```bash
-python -c "
-import pandas as pd
-canonical = pd.read_parquet('data/processed/canonical_features.parquet')
-
-# Controlla soggetti
-print('Soggetti unici:', canonical['subject_id'].nunique())
-
-# Controlla distribuzioni condizioni
-print(canonical['condition'].value_counts())
-
-# Controlla gruppi
-print(canonical['group'].value_counts())
-
-# Controlla missingness
-print('Missing values:', canonical.isnull().sum().sum())
-"
-```
 
 ### 3. Quality Control
 
@@ -879,18 +824,6 @@ python -m eeg_ms.features.build_tabular
 - Aggregazione ROI (6 al posto di 27 canali)
 - Creazione feature finali per ML
 
-**Verifica**:
-```bash
-python -c "
-import pandas as pd
-features = pd.read_parquet('data/processed/subject_features_roi.parquet')
-print(f'Shape: {features.shape}')
-print(f'Soggetti: {len(features)}')
-print(f'Feature: {features.shape[1]}')
-print(features.head())
-"
-```
-
 ### 5. Generazione Split Cross-Validation
 
 ```bash
@@ -901,17 +834,6 @@ python -m eeg_ms.validation.generate_splits
 
 **Contiene**: assegnamenti soggetti a fold (5 repeat × 4 fold = 20 scenari)
 
-**Verifica**:
-```bash
-python -c "
-import pandas as pd
-splits = pd.read_csv('data/processed/splits/outer_test_folds.csv')
-print(f'Righe (soggetti × fold): {len(splits)}')
-print(f'Repeat unici: {splits[\"repeat\"].nunique()}')
-print(f'Fold unici: {splits[\"fold\"].nunique()}')
-print(splits.head())
-"
-```
 
 ### 6. Training e tuning (Nested Cross-Validation)
 
@@ -942,23 +864,6 @@ artifacts/predictions/nested_cv_predictions.csv creato
      - Applica modello migliore su test fold
      - Registra metriche e predizioni
 
-**Verifica**:
-```bash
-python -c "
-import pandas as pd
-
-# Metriche
-metrics = pd.read_csv('artifacts/metrics/nested_cv_fold_metrics.csv')
-print(f'Numero righe (fold × modelli): {len(metrics)}')
-print(metrics.groupby('model')['roc_auc'].agg(['mean', 'std']))
-
-# Predizioni
-preds = pd.read_csv('artifacts/predictions/nested_cv_predictions.csv')
-print(f'Numero predizioni: {len(preds)}')
-print(preds.columns.tolist())
-"
-```
-
 ### 7. Analisi risultati
 
 ```bash
@@ -972,54 +877,12 @@ python -m eeg_ms.evaluation.analyze_results
 - `reports/tables/model_evaluation/subject_error_analysis.csv` - soggetti più difficili
 - `reports/figures/model_evaluation/` - grafici
 
-**Verifica**:
-```bash
-python -c "
-import pandas as pd
-
-summary = pd.read_csv('reports/tables/model_evaluation/fold_metric_summary.csv')
-print('Metriche aggregate per modello:')
-print(summary)
-"
-```
-
 ---
 
-## Interpretazione dei risultati
+## Possibili miglioramenti o idee aggiuntive
 
 1. **Feature Selection non adeguata**
-   - Le feature scelte (top-k da F-test) potrebbero non essere discriminanti
-   - Prova con altre strategie: mutual_information, recursive elimination
-
-2. **Aggregazione ROI troppo aggressiva**
-   - Media 27->6 canali potrebbe perdere pattern locali
-   - Prova con ROI diversi o aggregazione soft
-
----
-
-## Futuri sviluppi 
-1. **Deep Learning**
-   - CNN 1D su segnali EEG grezzi
-   - Input: (batch, n_channels, n_timepoints)
-   - Prova PyTorch + TorchEEG
-
-2. **Time-Series Specific Models**
-   - LSTM/GRU su tracce temporali
-   - Attention mechanisms
-   - Transformer per pattern temporali
-
-3. **Multi-modal Fusion**
-   - Combina PSD + Entropy + altri biomarker
-   - Combina EEG + MRI + clinical scores
-   - Fusion architecture (early, late, intermediate)
-
-4. **Probabilistic Models**
-   - Gaussian Process per uncertainty
-   - Bayesian Neural Networks
-   - Variational Autoencoder per outlier detection
-
-5. **Longitudinal Analysis**
-   - Se disponibili follow-up: modella evoluzione MS
-   - Mixed-effects models per intra-subject variability
+   - Provare con aggiunta di soggetti al dataset (imputazione?) -> forse performance <= ad oggi
+   - Prova con altre strategie/feature: guardare documento word condiviso su OneDrive
 
 ---

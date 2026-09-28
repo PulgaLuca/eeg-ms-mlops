@@ -204,6 +204,46 @@ def group_channel_map(
     return _ordered_values(group_values, info.ch_names)
 
 
+def group_channel_std_map(
+    canonical: pd.DataFrame,
+    info: mne.Info,
+    *,
+    group: str,
+    condition: str,
+    measure: str,
+    band: str,
+    window_statistic: Reducer = "median",
+    transform: str | None = None,
+) -> np.ndarray:
+    """Between-subject sample standard deviation for each channel."""
+
+    subset = _filter_channel_data(
+        canonical,
+        group=group,
+        condition=condition,
+        measure=measure,
+        band=band,
+    )
+    subset["value"] = _apply_transform(subset["value"], transform)
+
+    subject_values = (
+        subset.groupby(
+            ["subject_id", "location"],
+            observed=True,
+        )["value"]
+        .agg(window_statistic)
+        .rename("subject_value")
+        .reset_index()
+    )
+
+    variability = subject_values.groupby(
+        "location",
+        observed=True,
+    )["subject_value"].std(ddof=1)
+
+    return _ordered_values(variability, info.ch_names)
+
+
 def paired_condition_map(
     canonical: pd.DataFrame,
     info: mne.Info,
