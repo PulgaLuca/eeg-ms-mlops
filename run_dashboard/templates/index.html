@@ -28,8 +28,13 @@
     <a class="run-card" href="{{ url_for('run_detail', run_id=run.run_id) }}">
       <div class="run-main"><span class="status {{ run.status }}">{{ run.status }}</span><h3>{{ run.run_id }}</h3><p>{{ run.started_at }} · {{ run.duration }}</p></div>
       <div class="run-stat"><span>Soggetti</span><strong>{{ run.n_subjects }}</strong><small>{{ run.n_ms }} MS / {{ run.n_hc }} HC</small></div>
-      <div class="run-stat"><span>Modelli</span><strong>{{ run.models|length }}</strong><small>ROI + channel</small></div>
+      <div class="run-stat"><span>Modelli</span><strong>{{ run.models|length }}</strong><small>{{ run.spatial_levels|join(' + ') if run.spatial_levels else 'rappresentazione non indicata' }}</small></div>
       <div class="chevron">&rarr;</div>
+      <div class="run-preview">
+        {% for label, value in run.preview %}
+        <div class="run-preview-item"><span>{{ label }}</span><small>{{ value }}</small></div>
+        {% endfor %}
+      </div>
     </a>
     {% endfor %}
   </section>

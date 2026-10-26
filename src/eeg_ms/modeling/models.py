@@ -70,13 +70,15 @@ def _build_specification(
 
 def get_model_specifications(
     random_seed: int,
+    selected_models: list[str] | None = None,
 ) -> list[ModelSpecification]:
     """Restituisce i modelli attivi configurati nella cartella configs."""
 
     specifications: list[ModelSpecification] = []
+    selected = set(selected_models) if selected_models is not None else None
 
     dummy_config = _load_model_config("dummy")
-    if dummy_config:
+    if dummy_config and (selected is None or "dummy" in selected):
         specifications.append(
             _build_specification(
                 "dummy",
@@ -86,7 +88,7 @@ def get_model_specifications(
         )
 
     logistic_config = _load_model_config("logistic_elastic_net")
-    if logistic_config:
+    if logistic_config and (selected is None or "logistic_elastic_net" in selected):
         estimator_parameters = dict(logistic_config["estimator"])
         estimator_parameters["random_state"] = random_seed
         specifications.append(
@@ -98,7 +100,7 @@ def get_model_specifications(
         )
 
     lda_config = _load_model_config("lda")
-    if lda_config:
+    if lda_config and (selected is None or "lda" in selected):
         specifications.append(
             _build_specification(
                 "lda",
@@ -108,7 +110,7 @@ def get_model_specifications(
         )
 
     knn_config = _load_model_config("knn")
-    if knn_config:
+    if knn_config and (selected is None or "knn" in selected):
         specifications.append(
             _build_specification(
                 "knn",
@@ -118,7 +120,7 @@ def get_model_specifications(
         )
 
     random_forest_config = _load_model_config("random_forest")
-    if random_forest_config:
+    if random_forest_config and (selected is None or "random_forest" in selected):
         estimator_parameters = dict(random_forest_config["estimator"])
         estimator_parameters["random_state"] = random_seed
         specifications.append(
@@ -130,7 +132,7 @@ def get_model_specifications(
         )
 
     svm_config = _load_model_config("svm")
-    if svm_config:
+    if svm_config and (selected is None or "svm" in selected):
         estimator_parameters = dict(svm_config["estimator"])
         estimator_parameters["random_state"] = random_seed
         specifications.append(
@@ -142,7 +144,7 @@ def get_model_specifications(
         )
 
     xgboost_config = _load_model_config("xgboost")
-    if xgboost_config:
+    if xgboost_config and (selected is None or "xgboost" in selected):
         estimator_parameters = dict(xgboost_config["estimator"])
         estimator_parameters["random_state"] = random_seed
         specifications.append(

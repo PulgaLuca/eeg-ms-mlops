@@ -1,0 +1,42 @@
+name: epoch_mean_allfamilies_relpow_fractions_spectral_roi_oe_strat
+features:
+  aggregation_unit: epoch
+  statistics: []
+  feature_families:
+  - psd
+  - complexity
+  measures:
+  - absolute_power
+  - relative_power
+  - theta_alpha_ratio
+  - delta_alpha_ratio
+  - sfr
+  - spectral_entropy
+  bands:
+  - delta
+  - theta
+  - alpha
+  - beta
+  - gamma
+  - derived
+  - broadband
+  spatial_levels:
+  - roi
+  locations: []
+  condition_views:
+  - OE
+validation:
+  strategy: stratified
+  n_splits: 4
+  n_repeats: 5
+  inner_n_splits: null
+  primary_metric: null
+  random_seed: 42
+models:
+- dummy
+- logistic_elastic_net
+- lda
+- knn
+- random_forest
+- svm
+- xgboost

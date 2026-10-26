@@ -1,0 +1,46 @@
+name: epoch_oe_relative_complexity_all_models_stratified
+
+features:
+  # Un'epoca/finestra è una riga; le statistiche tra finestre non si applicano.
+  # 'mean' è quindi omessa intenzionalmente in questa modalità.
+  aggregation_unit: epoch
+  statistics: []
+  feature_families:
+    - psd
+    - complexity
+  # relative_power seleziona le PSD relative; spectral_entropy è la misura
+  # della famiglia complexity, già normalizzata nel dataset.
+  measures:
+    - relative_power
+    - spectral_entropy
+  bands:
+    - delta
+    - theta
+    - alpha
+    - beta
+    - gamma
+    - broadband
+  spatial_levels:
+    - channel
+    - roi
+  locations: []
+  # Nel dataset il codice della condizione a occhi aperti è OE.
+  condition_views:
+    - OE
+
+validation:
+  strategy: stratified
+  n_splits: 4
+  n_repeats: 5
+  inner_n_splits: null
+  primary_metric: null
+  random_seed: 42
+
+models:
+  - dummy
+  - logistic_elastic_net
+  - lda
+  - knn
+  - random_forest
+  - svm
+  - xgboost

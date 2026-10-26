@@ -1,0 +1,71 @@
+name: prova
+features:
+  aggregation_unit: epoch
+  statistics: []
+  feature_families:
+  - psd
+  - complexity
+  measures:
+  - absolute_power
+  - relative_power
+  - theta_alpha_ratio
+  - delta_alpha_ratio
+  - sfr
+  - spectral_entropy
+  bands:
+  - delta
+  - theta
+  - alpha
+  - beta
+  - gamma
+  - derived
+  - broadband
+  spatial_levels:
+  - channel
+  locations:
+  - Fp1
+  - Fp2
+  - F3
+  - F4
+  - C3
+  - C4
+  - P3
+  - P4
+  - O1
+  - O2
+  - F7
+  - F8
+  - T7
+  - T8
+  - P7
+  - P8
+  - Fz
+  - Cz
+  - Pz
+  - FC1
+  - FC2
+  - CP1
+  - CP2
+  - FC5
+  - FC6
+  - CP5
+  - CP6
+  condition_views:
+  - CE
+  - OE
+  - CE_minus_OE
+validation:
+  strategy: stratified
+  n_splits: 4
+  n_repeats: 5
+  inner_n_splits: null
+  primary_metric: null
+  random_seed: 42
+models:
+- dummy
+- logistic_elastic_net
+- lda
+- knn
+- random_forest
+- svm
+- xgboost

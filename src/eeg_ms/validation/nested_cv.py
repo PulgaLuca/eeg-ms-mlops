@@ -138,7 +138,9 @@ def run_nested_cv(
             scoring=config.primary_metric,
             cv=inner_cv,
             refit=True,
-            n_jobs=-1,
+            # Il campione è piccolo; un worker evita processi loky e warning
+            # di cleanup delle directory di memmapping su Windows.
+            n_jobs=1,
             return_train_score=False,
             error_score="raise",
         )

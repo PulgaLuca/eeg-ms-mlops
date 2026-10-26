@@ -52,6 +52,8 @@ def format_duration(seconds: Any) -> str:
 def model_rows(run_dir: Path) -> list[dict[str, Any]]:
     metrics_path = run_dir / "results" / "metrics" / "nested_cv_fold_metrics.csv"
     if not metrics_path.exists():
+        metrics_path = run_dir / "results" / "fold_metrics.csv"
+    if not metrics_path.exists():
         return []
 
     try:
@@ -65,6 +67,8 @@ def model_rows(run_dir: Path) -> list[dict[str, Any]]:
             "f1",
         ]
         available = [name for name in metric_names if name in metrics]
+        if not available or "model" not in metrics:
+            return []
         summary = metrics.groupby("model", as_index=False)[available].mean()
         rows = summary.to_dict(orient="records")
         for row in rows:
@@ -74,9 +78,56 @@ def model_rows(run_dir: Path) -> list[dict[str, Any]]:
         return []
 
 
+def run_images(run_dir: Path, folder: str) -> list[dict[str, str]]:
+    """List PNG figures from the run-local quality or evaluation output."""
+    candidates = {
+        "quality": [run_dir / "quality" / "figures"],
+        "evaluation": [
+            run_dir / "results" / "evaluation" / "figures",
+            run_dir / "evaluation" / "figures",  # legacy run layout
+        ],
+    }.get(folder, [])
+    images: list[dict[str, str]] = []
+    for directory in candidates:
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.png")):
+            images.append(
+                {
+                    "title": path.stem.replace("_", " ").capitalize(),
+                    "path": path.relative_to(run_dir).as_posix(),
+                }
+            )
+    return images
+
 def run_record(run_dir: Path) -> dict[str, Any]:
     metadata = read_json(run_dir / "metadata.json")
     subjects = metadata.get("subjects", {})
+    configuration = metadata.get("configuration", {})
+    spatial_levels = configuration.get("resolved_features", {}).get(
+        "spatial_levels", configuration.get("features", {}).get("spatial_levels", [])
+    )
+    feature_config = configuration.get("features", {})
+    resolved_features = configuration.get("resolved_features", {})
+
+    def display_values(values: Any) -> str:
+        if not values:
+            return "—"
+        if isinstance(values, (list, tuple)):
+            return ", ".join(str(value) for value in values)
+        return str(values)
+
+    preview = [
+        ("Unità osservazionale", feature_config.get("aggregation_unit", "—")),
+        ("Statistiche", display_values(feature_config.get("statistics"))),
+        ("Condizioni", display_values(feature_config.get("condition_views"))),
+        (
+            "Famiglie",
+            display_values(resolved_features.get("feature_families", feature_config.get("feature_families"))),
+        ),
+        ("Misure", display_values(resolved_features.get("measures", feature_config.get("measures")))),
+        ("Posizioni", display_values(spatial_levels)),
+    ]
     return {
         "run_id": metadata.get("run_id", run_dir.name),
         "status": metadata.get("status", "unknown"),
@@ -88,6 +139,10 @@ def run_record(run_dir: Path) -> dict[str, Any]:
         "n_hc": subjects.get("group_counts", {}).get("hc", "-"),
         "metadata": metadata,
         "models": model_rows(run_dir),
+        "spatial_levels": spatial_levels,
+        "preview": preview,
+        "quality_images": run_images(run_dir, "quality"),
+        "evaluation_images": run_images(run_dir, "evaluation"),
         "path": run_dir,
     }
 
@@ -154,6 +209,26 @@ def run_file(run_id: str, relative_path: str):
     if run_dir not in requested.parents or not requested.is_file():
         abort(404)
     return send_file(requested, as_attachment=True, download_name=requested.name)
+
+
+@app.route("/runs/<run_id>/images/<path:image_path>")
+def run_image(run_id: str, image_path: str):
+    """Serve only PNGs stored in the run's approved figure directories."""
+    get_run_or_404(run_id)
+    run_dir = RUNS_DIR / run_id
+    requested = (run_dir / image_path).resolve()
+    allowed_directories = [
+        (run_dir / "quality" / "figures").resolve(),
+        (run_dir / "results" / "evaluation" / "figures").resolve(),
+        (run_dir / "evaluation" / "figures").resolve(),  # legacy run layout
+    ]
+    if (
+        requested.suffix.lower() != ".png"
+        or not requested.is_file()
+        or not any(directory == requested.parent for directory in allowed_directories)
+    ):
+        abort(404)
+    return send_file(requested, mimetype="image/png", as_attachment=False, max_age=0)
 
 
 if __name__ == "__main__":

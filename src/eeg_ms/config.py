@@ -52,6 +52,8 @@ OOF_PREDICTIONS_FILE = PREDICTIONS_DIR / "nested_cv_predictions.csv"
 
 SELECTED_FEATURES_FILE = ARTIFACTS / "selected_features" / "nested_cv_selected_features.csv"
 
+EXPERIMENT_CONFIGS = CONFIGS / "experiments"
+
 TARGET_MAP = {
     "hc": 0,
     "ms": 1,

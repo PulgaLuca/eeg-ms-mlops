@@ -2,8 +2,8 @@ enabled: true
 scale_features: true
 
 estimator:
-  penalty: elasticnet
   solver: saga
+  l1_ratio: 0.5
   class_weight: balanced
   max_iter: 20000
 

@@ -38,7 +38,7 @@ Il progetto segue le caratteristiche della metodologia MLOps:
 | Elaborazione dati | `pandas` | ≥2.2 |
 | Calcoli numerici | `numpy` | ≥2.0 |
 | Segnali | `scipy` | ≥1.14 |
-| ML | `scikit-learn` | ≥1.6 |
+| ML | `scikit-learn` | ≥1.8 |
 | Gradient Boosting | `xgboost` | ≥3.0 |
 | I/O | `pyarrow` | ≥17.0 |
 | Visualizzazione | `matplotlib`, `seaborn` | ≥3.9, ≥0.13 |
@@ -367,8 +367,8 @@ DummyClassifier(strategy="prior")
 
 ```python
 LogisticRegression(
-    penalty="elasticnet",
     solver="saga",
+    l1_ratio=0.5,
     class_weight="balanced",
     max_iter=20_000,
     random_state=42
@@ -884,5 +884,37 @@ python -m eeg_ms.evaluation.analyze_results
 1. **Feature Selection non adeguata**
    - Provare con aggiunta di soggetti al dataset (imputazione?) -> forse performance <= ad oggi
    - Prova con altre strategie/feature: guardare documento word condiviso su OneDrive
+
+---
+
+## Pipeline configurabile per esperimenti
+
+Per avviare un run end-to-end con scelte interattive prima del feature engineering:
+
+```bash
+python -m eeg_ms.pipeline --wizard
+```
+
+La procedura guidata salva una configurazione YAML riutilizzabile sotto `configs/experiments/` e avvia audit/loading, controllo qualità, costruzione delle feature, classificazione e valutazione. In seguito si può ripetere il run senza prompt:
+
+```bash
+python -m eeg_ms.pipeline --config configs/experiments/NOME.yaml
+```
+
+Senza `--wizard` o `--config` viene caricata `configs/experiments/default.yaml`. Le configurazioni sono normali file YAML modificabili, quindi permettono anche di selezionare nomi specifici di canale/ROI o usare `all` per tutte le opzioni disponibili nei dati.
+
+Le opzioni comprendono:
+
+- unità osservazionale `subject` (riassume le finestre con statistiche scelte) oppure `epoch` (una riga per finestra, senza statistiche tra finestre);
+- statistiche, famiglie, misure, bande, livelli spaziali e viste CE/OE/CE−OE;
+- modelli selezionati tra Dummy, Logistic Elastic Net, LDA, KNN, Random Forest, SVM e XGBoost;
+- validazione `nested` con tuning interno oppure `stratified` senza tuning, con numero di fold, ripetizioni e seed impostabili.
+- metrica per la selezione interna tra ROC-AUC, balanced accuracy e average precision (solo nested).
+
+**Sicurezza degli split per epoca:** in modalità `epoch`, `subject_id` è sempre usato come gruppo sia nei fold esterni sia nei fold interni. Tutte le finestre della stessa persona rimangono nel train o nel test; non vengono distribuite tra entrambi. Le probabilità delle finestre test vengono mediate per soggetto e le metriche principali sono calcolate sui soggetti, così chi ha più righe non pesa di più nella valutazione.
+
+La modalità `epoch` aumenta le righe di training, ma non il numero di soggetti indipendenti: non va interpretata come acquisizione di nuovi pazienti. Le statistiche tra finestre sono disabilitate in questa modalità perché ciascuna finestra è già una singola osservazione.
+
+Ogni esecuzione crea una cartella indipendente in `artifacts/runs/<run_id>/`, che contiene `configuration.yaml` (scelte originali e risolte, parametri e griglie dei modelli), `configuration.sha256`, metadati, copia degli input, matrice feature, risultati, predizioni, feature selezionate, tabelle e grafici di valutazione. In `quality/figures/` vengono salvati sia i grafici generali di controllo qualità sia grafici specifici del run: conteggio delle feature incluse per famiglia/misura/livello spaziale e distribuzioni HC/MS di esempi delle feature configurate. In modalità epoch questi ultimi aggregano le finestre entro soggetto solo per la visualizzazione. In questo modo più prove non sovrascrivono i risultati dei run precedenti.
 
 ---

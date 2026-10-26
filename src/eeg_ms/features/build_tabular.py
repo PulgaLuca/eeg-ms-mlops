@@ -229,6 +229,128 @@ def build_subject_feature_matrix(
     return result
 
 
+def build_configured_feature_matrix(
+    canonical: pd.DataFrame,
+    subjects: pd.DataFrame,
+    *,
+    aggregation_unit: str,
+    statistics: Sequence[str],
+    condition_views: Sequence[str],
+    feature_families: Sequence[str],
+    measures: Sequence[str],
+    bands: Sequence[str],
+    spatial_levels: Sequence[str],
+    locations: Sequence[str] | None = None,
+) -> pd.DataFrame:
+    """Build the configured subject-level or window-level ML matrix."""
+    print("  FE 1/4: filtro il dataset canonico secondo la configurazione...", flush=True)
+    if aggregation_unit not in {"subject", "epoch"}:
+        raise ValueError("aggregation_unit deve essere 'subject' o 'epoch'.")
+    if aggregation_unit == "epoch" and statistics:
+        raise ValueError("Le statistiche tra finestre non si applicano alla modalità epoch.")
+
+    selected = canonical.loc[
+        canonical["feature_family"].isin(feature_families)
+        & canonical["measure"].isin(measures)
+        & canonical["band"].isin(bands)
+        & canonical["spatial_level"].isin(spatial_levels)
+    ].copy()
+    if locations:
+        selected = selected.loc[selected["location"].isin(locations)]
+    if selected.empty:
+        raise ValueError("La selezione non corrisponde ad alcuna feature canonica.")
+    print(
+        f"  FE 2/4: selezionate {len(selected):,} misure canoniche; "
+        f"{selected['subject_id'].nunique()} soggetti.",
+        flush=True,
+    )
+
+    group_keys = ["subject_id", "condition", *FEATURE_DESCRIPTOR_COLUMNS]
+    if aggregation_unit == "epoch":
+        print("  FE 3/4: costruisco una riga per soggetto e finestra, abbinando le condizioni...", flush=True)
+        group_keys.append("window")
+        values = selected[group_keys + ["value"]].rename(columns={"value": "CE"})
+        pivot_keys = ["subject_id", "window", *FEATURE_DESCRIPTOR_COLUMNS]
+        paired = values.pivot(index=pivot_keys, columns="condition", values="CE").reset_index()
+        paired.columns.name = None
+        if "CE" not in paired:
+            paired["CE"] = pd.NA
+        if "OE" not in paired:
+            paired["OE"] = pd.NA
+        paired["CE_minus_OE"] = paired["CE"] - paired["OE"]
+        available_views = [view for view in condition_views if view in paired.columns]
+        if len(available_views) != len(condition_views):
+            raise ValueError("Vista di condizione richiesta non disponibile in modalità epoch.")
+        long = paired.melt(
+            id_vars=pivot_keys,
+            value_vars=available_views,
+            var_name="condition_view",
+            value_name="feature_value",
+        )
+        long["statistic"] = "value"
+        long = create_feature_names(long)
+        matrix = long.pivot(
+            index=["subject_id", "window"],
+            columns="feature_name",
+            values="feature_value",
+        ).reset_index()
+        print(f"  FE 4/4: matrice epoche pronta, {len(matrix):,} righe e {matrix.shape[1] - 2} feature.", flush=True)
+        metadata = subjects[["subject_id", "group", "target", "visit"]].drop_duplicates("subject_id")
+        return metadata.merge(matrix, on="subject_id", how="inner", validate="one_to_many")
+
+    if not statistics:
+        raise ValueError("Selezionare almeno una statistica in modalità subject.")
+    print("  FE 3/4: aggrego le finestre per soggetto e calcolo le statistiche selezionate...", flush=True)
+    aggregated = (
+        selected
+        .groupby(group_keys, observed=True, dropna=False)["value"]
+        .agg(list)
+        .reset_index(name="values")
+    )
+    print(f"  FE 3/4: aggregazione completata ({len(aggregated):,} gruppi feature/condizione); preparo le viste CE/OE.", flush=True)
+    statistic_functions = {
+        "mean": lambda x: float(pd.Series(x).mean()),
+        "std": lambda x: float(pd.Series(x).std()),
+        "median": lambda x: float(pd.Series(x).median()),
+        "q25": lambda x: float(pd.Series(x).quantile(0.25)),
+        "q75": lambda x: float(pd.Series(x).quantile(0.75)),
+        "iqr": lambda x: float(pd.Series(x).quantile(0.75) - pd.Series(x).quantile(0.25)),
+        "min": lambda x: float(pd.Series(x).min()),
+        "max": lambda x: float(pd.Series(x).max()),
+    }
+    unknown = set(statistics) - set(statistic_functions)
+    if unknown:
+        raise ValueError(f"Statistiche non riconosciute: {sorted(unknown)}")
+    for statistic in statistics:
+        aggregated[statistic] = aggregated["values"].map(statistic_functions[statistic])
+    aggregated = aggregated.drop(columns="values")
+    long_statistics = aggregated.melt(
+        id_vars=["subject_id", "condition", *FEATURE_DESCRIPTOR_COLUMNS],
+        value_vars=list(statistics),
+        var_name="statistic",
+        value_name="feature_value",
+    )
+    index_columns = ["subject_id", *FEATURE_DESCRIPTOR_COLUMNS, "statistic"]
+    paired = long_statistics.pivot(index=index_columns, columns="condition", values="feature_value").reset_index()
+    paired.columns.name = None
+    if "CE" not in paired:
+        paired["CE"] = pd.NA
+    if "OE" not in paired:
+        paired["OE"] = pd.NA
+    paired["CE_minus_OE"] = paired["CE"] - paired["OE"]
+    long = paired.melt(
+        id_vars=index_columns,
+        value_vars=list(condition_views),
+        var_name="condition_view",
+        value_name="feature_value",
+    )
+    long = create_feature_names(long)
+    matrix = long.pivot(index="subject_id", columns="feature_name", values="feature_value").reset_index()
+    print(f"  FE 4/4: matrice soggetti pronta, {len(matrix):,} righe e {matrix.shape[1] - 1} feature.", flush=True)
+    metadata = subjects[["subject_id", "group", "target", "visit"]].drop_duplicates("subject_id")
+    return metadata.merge(matrix, on="subject_id", how="inner", validate="one_to_one")
+
+
 def main() -> None:
     canonical = pd.read_parquet(CANONICAL_DATA)
     subjects = pd.read_csv(SUBJECTS_DATA)

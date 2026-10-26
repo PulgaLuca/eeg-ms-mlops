@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/eeg_ms/__init__.py
 src/eeg_ms/config.py
+src/eeg_ms/tracking.py
 src/eeg_ms/data/__init__.py
 src/eeg_ms/data/audit.py
 src/eeg_ms/data/build_dataset.py

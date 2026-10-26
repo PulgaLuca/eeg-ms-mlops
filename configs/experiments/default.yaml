@@ -1,0 +1,21 @@
+name: roi_baseline_configurable
+
+features:
+  aggregation_unit: subject
+  statistics: [mean]
+  feature_families: [psd, complexity]
+  measures: [absolute_power, relative_power, theta_alpha_ratio, delta_alpha_ratio, sfr, spectral_entropy]
+  bands: [delta, theta, alpha, beta, gamma, derived, broadband]
+  spatial_levels: [channel, roi]
+  locations: []
+  condition_views: [CE, OE, CE_minus_OE]
+
+validation:
+  strategy: nested
+  n_splits: 4
+  n_repeats: 5
+  inner_n_splits: 3
+  primary_metric: roc_auc
+  random_seed: 42
+
+models: [dummy, logistic_elastic_net, lda, knn, random_forest, svm, xgboost]
